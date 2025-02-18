@@ -48,4 +48,10 @@ void EPD_2in13_V4_Display_Base(UBYTE *Image);
 void EPD_2in13_V4_Display_Partial(UBYTE *Image);
 void EPD_2in13_V4_Sleep(void);
 
+void EPD_2in13_V4_SendCommand(UBYTE Reg);
+void EPD_2in13_V4_SendData(UBYTE Data);
+void EPD_2in13_V4_TurnOnDisplay(void);
+void EPD_2in13_V4_TurnOnDisplay_Fast(void);
+void EPD_2in13_V4_TurnOnDisplay_Partial(void);
+
 #endif

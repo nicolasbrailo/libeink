@@ -35,7 +35,7 @@ CFLAGS= \
 	-Wno-strict-prototypes \
 	-Wno-unused-function \
 	-ggdb -O3 -ffunction-sections -fdata-sections -pthread $(LIBEINK_DEFS) $(INCLUDE_DIRS)
-LDFLAGS=-Wl,--gc-sections -lm
+LDFLAGS=-Wl,--gc-sections -lm -lcairo
 
 eink: \
 		build/liblgpio/lgCtx.o \
@@ -74,7 +74,6 @@ build/%.o: %.c
 	mkdir -p $(shell dirname $@)
 	clang $(CFLAGS) -c $^ -o $@
 
-
 .PHONY: xcompile-start xcompile-end xcompile-rebuild-sysrootdeps
 
 xcompile-start:
@@ -84,9 +83,10 @@ xcompile-end:
 	./rpiz-xcompile/umount_rpy_root.sh ~/src/xcomp-rpiz-env
 
 install_sysroot_deps:
+	# TODO cairo
 	true
 
 run: eink
-	#scp eink StoneBakedMargheritaHomeboard:/home/batman/eink
-	ssh StoneBakedMargheritaHomeboard /home/batman/eink/eink
+	scp eink StoneBakedMargheritaHomeboard:/home/batman/eink
+	#ssh StoneBakedMargheritaHomeboard /home/batman/eink/eink
 

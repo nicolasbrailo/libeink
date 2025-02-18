@@ -49,25 +49,7 @@ int EPD_SCLK_PIN;
  * GPIO read and write
  **/
 void DEV_Digital_Write(UWORD Pin, UBYTE Value) {
-#ifdef RPI
-#ifdef USE_BCM2835_LIB
-  bcm2835_gpio_write(Pin, Value);
-#elif defined(USE_WIRINGPI_LIB)
-  digitalWrite(Pin, Value);
-#elif defined(USE_LGPIO_LIB)
   lgGpioWrite(GPIO_Handle, Pin, Value);
-#elif USE_DEV_LIB
-  GPIOD_Write(Pin, Value);
-#endif
-#endif
-
-#ifdef JETSON
-#ifdef USE_DEV_LIB
-  SYSFS_GPIO_Write(Pin, Value);
-#elif USE_HARDWARE_LIB
-  Debug("not support");
-#endif
-#endif
 }
 
 UBYTE DEV_Digital_Read(UWORD Pin) {
@@ -197,106 +179,16 @@ void DEV_GPIO_Mode(UWORD Pin, UWORD Mode) {
 /**
  * delay x ms
  **/
-void DEV_Delay_ms(UDOUBLE xms) {
-#ifdef RPI
-#ifdef USE_BCM2835_LIB
-  bcm2835_delay(xms);
-#elif USE_WIRINGPI_LIB
-  delay(xms);
-#elif USE_LGPIO_LIB
-  lguSleep(xms / 1000.0);
-#elif USE_DEV_LIB
-  UDOUBLE i;
-  for (i = 0; i < xms; i++) {
-    usleep(1000);
-  }
-#endif
-#endif
+void DEV_Delay_ms(size_t xms) {
+  struct timespec ts, rem;
 
-#ifdef JETSON
-  UDOUBLE i;
-  for (i = 0; i < xms; i++) {
-    usleep(1000);
-  }
-#endif
-}
+  if (xms > 0) {
+    ts.tv_sec = xms / 1000;
+    ts.tv_nsec = (xms - (1000 * ts.tv_sec)) * 1E6;
 
-static int DEV_Equipment_Testing(void) {
-  FILE *fp;
-  char issue_str[64];
-
-  fp = fopen("/etc/issue", "r");
-  if (fp == NULL) {
-    Debug("Unable to open /etc/issue");
-    return -1;
+    while (clock_nanosleep(CLOCK_REALTIME, 0, &ts, &rem))
+      ts = rem;
   }
-  if (fread(issue_str, 1, sizeof(issue_str), fp) <= 0) {
-    Debug("Unable to read from /etc/issue");
-    return -1;
-  }
-  issue_str[sizeof(issue_str) - 1] = '\0';
-  fclose(fp);
-
-  printf("Current environment: ");
-#ifdef RPI
-  char systems[][9] = {"Raspbian", "Debian", "NixOS"};
-  int detected = 0;
-  for (int i = 0; i < 3; i++) {
-    if (strstr(issue_str, systems[i]) != NULL) {
-      printf("%s\n", systems[i]);
-      detected = 1;
-    }
-  }
-  if (!detected) {
-    printf("not recognized\n");
-    printf("Built for Raspberry Pi, but unable to detect environment.\n");
-    printf("Perhaps you meant to 'make JETSON' instead?\n");
-    return -1;
-  }
-#endif
-#ifdef JETSON
-  char system[] = {"Ubuntu"};
-  if (strstr(issue_str, system) != NULL) {
-    printf("%s\n", system);
-  } else {
-    printf("not recognized\n");
-    printf("Built for Jetson, but unable to detect environment.\n");
-    printf("Perhaps you meant to 'make RPI' instead?\n");
-    return -1;
-  }
-#endif
-  return 0;
-}
-
-void DEV_GPIO_Init(void) {
-#ifdef RPI
-  EPD_RST_PIN = 17;
-  EPD_DC_PIN = 25;
-  EPD_CS_PIN = 8;
-  EPD_PWR_PIN = 18;
-  EPD_BUSY_PIN = 24;
-  EPD_MOSI_PIN = 10;
-  EPD_SCLK_PIN = 11;
-#elif JETSON
-  EPD_RST_PIN = GPIO17;
-  EPD_DC_PIN = GPIO25;
-  EPD_CS_PIN = SPI0_CS0;
-  EPD_PWR_PIN = GPIO18;
-  EPD_BUSY_PIN = GPIO24;
-  EPD_MOSI_PIN = SPI0_MOSI;
-  EPD_SCLK_PIN = SPI0_SCLK;
-#endif
-
-  DEV_GPIO_Mode(EPD_BUSY_PIN, 0);
-  DEV_GPIO_Mode(EPD_RST_PIN, 1);
-  DEV_GPIO_Mode(EPD_DC_PIN, 1);
-  DEV_GPIO_Mode(EPD_CS_PIN, 1);
-  DEV_GPIO_Mode(EPD_PWR_PIN, 1);
-  // DEV_GPIO_Mode(EPD_MOSI_PIN, 0);
-  // DEV_GPIO_Mode(EPD_SCLK_PIN, 1);
-
-  DEV_Digital_Write(EPD_CS_PIN, 1);
-  DEV_Digital_Write(EPD_PWR_PIN, 1);
 }
 
 void DEV_SPI_SendnData(UBYTE *Reg) {
@@ -350,92 +242,42 @@ function:	Module Initialize, the library and initialize the pins, SPI
 protocol parameter: Info:
 ******************************************************************************/
 UBYTE DEV_Module_Init(void) {
-  printf("/***********************************/ \r\n");
-  if (DEV_Equipment_Testing() < 0) {
-    return 1;
-  }
-#ifdef RPI
-#ifdef USE_BCM2835_LIB
-  if (!bcm2835_init()) {
-    printf("bcm2835 init failed  !!! \r\n");
-    return 1;
-  } else {
-    printf("bcm2835 init success !!! \r\n");
+  printf("DEV_Module_Init\n");
+  GPIO_Handle = lgGpiochipOpen(0);
+  if (GPIO_Handle < 0) {
+    GPIO_Handle = lgGpiochipOpen(4);
+    if (GPIO_Handle < 0) {
+      Debug("Can't find /dev/gpiochip[1|4]\n");
+      return -1;
+    }
   }
 
-  // GPIO Config
-  DEV_GPIO_Init();
-
-  bcm2835_spi_begin(); // Start spi interface, set spi pin for the reuse
-                       // function
-  bcm2835_spi_setBitOrder(
-      BCM2835_SPI_BIT_ORDER_MSBFIRST);        // High first transmission
-  bcm2835_spi_setDataMode(BCM2835_SPI_MODE0); // spi mode 0
-  bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_128); // Frequency
-  bcm2835_spi_chipSelect(BCM2835_SPI_CS0);                    // set CE0
-  bcm2835_spi_setChipSelectPolarity(BCM2835_SPI_CS0, LOW);    // enable cs0
-
-#elif USE_WIRINGPI_LIB
-  // if(wiringPiSetup() < 0)//use wiringpi Pin number table
-  if (wiringPiSetupGpio() < 0) { // use BCM2835 Pin number table
-    printf("set wiringPi lib failed	!!! \r\n");
-    return 1;
-  } else {
-    printf("set wiringPi lib success !!! \r\n");
-  }
-
-  // GPIO Config
-  DEV_GPIO_Init();
-  wiringPiSPISetup(0, 10000000);
-  // wiringPiSPISetupMode(0, 32000000, 0);
-#elif USE_LGPIO_LIB
-  char buffer[NUM_MAXBUF];
-  FILE *fp;
-  fp = popen("cat /proc/cpuinfo | grep 'Raspberry Pi 5'", "r");
-  if (fp == NULL) {
-    Debug("It is not possible to determine the model of the Raspberry PI\n");
+  SPI_Handle = lgSpiOpen(0, 0, 10000000, 0);
+  if (SPI_Handle == LG_SPI_IOCTL_FAILED) {
+    Debug("Can't open SPI\n");
     return -1;
   }
 
-  if (fgets(buffer, sizeof(buffer), fp) != NULL) {
-    GPIO_Handle = lgGpiochipOpen(4);
-    if (GPIO_Handle < 0) {
-      Debug("gpiochip4 Export Failed\n");
-      return -1;
-    }
-  } else {
-    GPIO_Handle = lgGpiochipOpen(0);
-    if (GPIO_Handle < 0) {
-      Debug("gpiochip0 Export Failed\n");
-      return -1;
-    }
-  }
-  SPI_Handle = lgSpiOpen(0, 0, 10000000, 0);
-  DEV_GPIO_Init();
-#elif USE_DEV_LIB
-  printf("Write and read /dev/spidev0.0 \r\n");
-  GPIOD_Export();
-  DEV_GPIO_Init();
-  DEV_HARDWARE_SPI_begin("/dev/spidev0.0");
-  DEV_HARDWARE_SPI_setSpeed(10000000);
-#endif
+  EPD_RST_PIN = 17;
+  EPD_DC_PIN = 25;
+  EPD_CS_PIN = 8;
+  EPD_PWR_PIN = 18;
+  EPD_BUSY_PIN = 24;
+  EPD_MOSI_PIN = 10;
+  EPD_SCLK_PIN = 11;
 
-#elif JETSON
-#ifdef USE_DEV_LIB
-  DEV_GPIO_Init();
-  printf("Software spi\r\n");
-  SYSFS_software_spi_begin();
-  SYSFS_software_spi_setBitOrder(SOFTWARE_SPI_MSBFIRST);
-  SYSFS_software_spi_setDataMode(SOFTWARE_SPI_Mode0);
-  SYSFS_software_spi_setClockDivider(SOFTWARE_SPI_CLOCK_DIV4);
-#elif USE_HARDWARE_LIB
-  printf("Write and read /dev/spidev0.0 \r\n");
-  DEV_GPIO_Init();
-  DEV_HARDWARE_SPI_begin("/dev/spidev0.0");
-#endif
+  DEV_GPIO_Mode(EPD_BUSY_PIN, 0);
+  DEV_GPIO_Mode(EPD_RST_PIN, 1);
+  DEV_GPIO_Mode(EPD_DC_PIN, 1);
+  DEV_GPIO_Mode(EPD_CS_PIN, 1);
+  DEV_GPIO_Mode(EPD_PWR_PIN, 1);
+  // DEV_GPIO_Mode(EPD_MOSI_PIN, 0);
+  // DEV_GPIO_Mode(EPD_SCLK_PIN, 1);
 
-#endif
-  printf("/***********************************/ \r\n");
+  DEV_Digital_Write(EPD_CS_PIN, 1);
+  DEV_Digital_Write(EPD_PWR_PIN, 1);
+
+  printf("/DEV_Module_Init\n");
   return 0;
 }
 

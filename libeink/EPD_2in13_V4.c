@@ -49,7 +49,7 @@ function :	send command
 parameter:
      Reg : Command register
 ******************************************************************************/
-static void EPD_2in13_V4_SendCommand(UBYTE Reg) {
+void EPD_2in13_V4_SendCommand(UBYTE Reg) {
   DEV_Digital_Write(EPD_DC_PIN, 0);
   DEV_Digital_Write(EPD_CS_PIN, 0);
   DEV_SPI_WriteByte(Reg);
@@ -61,7 +61,7 @@ function :	send data
 parameter:
     Data : Write data
 ******************************************************************************/
-static void EPD_2in13_V4_SendData(UBYTE Data) {
+void EPD_2in13_V4_SendData(UBYTE Data) {
   DEV_Digital_Write(EPD_DC_PIN, 1);
   DEV_Digital_Write(EPD_CS_PIN, 0);
   DEV_SPI_WriteByte(Data);
@@ -123,21 +123,21 @@ static void EPD_2in13_V4_SetCursor(UWORD Xstart, UWORD Ystart) {
 function :	Turn On Display
 parameter:
 ******************************************************************************/
-static void EPD_2in13_V4_TurnOnDisplay(void) {
+void EPD_2in13_V4_TurnOnDisplay(void) {
   EPD_2in13_V4_SendCommand(0x22); // Display Update Control
   EPD_2in13_V4_SendData(0xf7);
   EPD_2in13_V4_SendCommand(0x20); // Activate Display Update Sequence
   EPD_2in13_V4_ReadBusy();
 }
 
-static void EPD_2in13_V4_TurnOnDisplay_Fast(void) {
+void EPD_2in13_V4_TurnOnDisplay_Fast(void) {
   EPD_2in13_V4_SendCommand(0x22); // Display Update Control
   EPD_2in13_V4_SendData(0xc7);    // fast:0x0c, quality:0x0f, 0xcf
   EPD_2in13_V4_SendCommand(0x20); // Activate Display Update Sequence
   EPD_2in13_V4_ReadBusy();
 }
 
-static void EPD_2in13_V4_TurnOnDisplay_Partial(void) {
+void EPD_2in13_V4_TurnOnDisplay_Partial(void) {
   EPD_2in13_V4_SendCommand(0x22); // Display Update Control
   EPD_2in13_V4_SendData(0xff);    // fast:0x0c, quality:0x0f, 0xcf
   EPD_2in13_V4_SendCommand(0x20); // Activate Display Update Sequence
