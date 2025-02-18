@@ -1,7 +1,7 @@
 /*****************************************************************************
 * | File      	:   ImageData.h
 * | Author      :   Waveshare team
-* | Function    :	
+* | Function    :
 *----------------
 * |	This version:   V1.0
 * | Date        :   2018-10-23
@@ -34,7 +34,6 @@
 // ImageData2
 extern const unsigned char gImage_2in13b_V4b[];
 extern const unsigned char gImage_2in13b_V4r[];
-
 
 /* ------------------------------------------------ */
 // Imagedata
@@ -92,5 +91,3 @@ extern const unsigned char gImage_13in3k[];
 
 #endif
 /* FILE END */
-
-

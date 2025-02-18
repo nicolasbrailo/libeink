@@ -28,15 +28,15 @@ For more information, please refer to <http://unlicense.org/>
 #ifndef LGPIO_H
 #define LGPIO_H
 
-#include <stdint.h>
 #include <inttypes.h>
-#include <pthread.h>
 #include <linux/gpio.h>
+#include <pthread.h>
+#include <stdint.h>
 
 #define LGPIO_VERSION 0x00020200
 
-#define LG_CD "LG_CD"  /* configuration directory */
-#define LG_WD "LG_WD"  /* working directory */
+#define LG_CD "LG_CD" /* configuration directory */
+#define LG_WD "LG_WD" /* working directory */
 
 /*TEXT
 
@@ -213,95 +213,95 @@ extern "C" {
 
 #else
 
-#define htonll(x) (((uint64_t)htonl((x)&0xffffffff)<<32)|htonl((x)>>32))
-#define ntohll(x) (((uint64_t)ntohl((x)&0xffffffff)<<32)|ntohl((x)>>32))
+#define htonll(x) (((uint64_t)htonl((x) & 0xffffffff) << 32) | htonl((x) >> 32))
+#define ntohll(x) (((uint64_t)ntohl((x) & 0xffffffff) << 32) | ntohl((x) >> 32))
 
 #endif
 
 #define LG_CFG_ID_DEBUG_LEVEL 0
-#define LG_CFG_ID_MIN_DELAY   1
+#define LG_CFG_ID_MIN_DELAY 1
 
 #define LG_MAX_PATH 1024
 
-#define LG_THREAD_NONE    0
+#define LG_THREAD_NONE 0
 #define LG_THREAD_STARTED 1
 #define LG_THREAD_RUNNING 2
 
-#define LG_NOTIFY_CLOSED   0
-#define LG_NOTIFY_CLOSING  1
-#define LG_NOTIFY_RUNNING  2
-#define LG_NOTIFY_PAUSED   3
+#define LG_NOTIFY_CLOSED 0
+#define LG_NOTIFY_CLOSING 1
+#define LG_NOTIFY_RUNNING 2
+#define LG_NOTIFY_PAUSED 3
 
 #define MAX_REPORT 250
 #define MAX_SAMPLE 4000
 
 #define MAX_EMITS (PIPE_BUF / sizeof(lgGpioReport_t))
 
-#define STACK_SIZE (256*1024)
+#define STACK_SIZE (256 * 1024)
 
 #define LG_USER_LEN 16
 #define LG_SALT_LEN 16
 
 /* File constants
-*/
+ */
 
-#define LG_FILE_NONE   0
-#define LG_FILE_MIN    1
-#define LG_FILE_READ   1
-#define LG_FILE_WRITE  2
-#define LG_FILE_RW     3
+#define LG_FILE_NONE 0
+#define LG_FILE_MIN 1
+#define LG_FILE_READ 1
+#define LG_FILE_WRITE 2
+#define LG_FILE_RW 3
 #define LG_FILE_APPEND 4
 #define LG_FILE_CREATE 8
-#define LG_FILE_TRUNC  16
-#define LG_FILE_MAX    31
+#define LG_FILE_TRUNC 16
+#define LG_FILE_MAX 31
 
-#define LG_FROM_START   0
+#define LG_FROM_START 0
 #define LG_FROM_CURRENT 1
-#define LG_FROM_END     2
+#define LG_FROM_END 2
 
 /* GPIO constants
-*/
+ */
 
 #define LG_GPIO_LABEL_LEN 32
-#define LG_GPIO_NAME_LEN  32
-#define LG_GPIO_USER_LEN  32
+#define LG_GPIO_NAME_LEN 32
+#define LG_GPIO_USER_LEN 32
 
 /* used to report line status */
 
-#define LG_GPIO_IS_KERNEL         1
-#define LG_GPIO_IS_OUTPUT         2
-#define LG_GPIO_IS_ACTIVE_LOW     4
-#define LG_GPIO_IS_OPEN_DRAIN     8
-#define LG_GPIO_IS_OPEN_SOURCE    16
-#define LG_GPIO_IS_PULL_UP        32
-#define LG_GPIO_IS_PULL_DOWN      64
-#define LG_GPIO_IS_PULL_NONE      128
+#define LG_GPIO_IS_KERNEL 1
+#define LG_GPIO_IS_OUTPUT 2
+#define LG_GPIO_IS_ACTIVE_LOW 4
+#define LG_GPIO_IS_OPEN_DRAIN 8
+#define LG_GPIO_IS_OPEN_SOURCE 16
+#define LG_GPIO_IS_PULL_UP 32
+#define LG_GPIO_IS_PULL_DOWN 64
+#define LG_GPIO_IS_PULL_NONE 128
 
-#define LG_GPIO_IS_INPUT          65536
-#define LG_GPIO_IS_RISING_EDGE    131072
-#define LG_GPIO_IS_FALLING_EDGE   262144
+#define LG_GPIO_IS_INPUT 65536
+#define LG_GPIO_IS_RISING_EDGE 131072
+#define LG_GPIO_IS_FALLING_EDGE 262144
 #define LG_GPIO_IS_REALTIME_CLOCK 524288
 
 /* use to set event flags */
 
-#define LG_RISING_EDGE        1
-#define LG_FALLING_EDGE       2
-#define LG_BOTH_EDGES         3
+#define LG_RISING_EDGE 1
+#define LG_FALLING_EDGE 2
+#define LG_BOTH_EDGES 3
 
 /* use to set line flags */
 
-#define LG_SET_ACTIVE_LOW  4
-#define LG_SET_OPEN_DRAIN  8
+#define LG_SET_ACTIVE_LOW 4
+#define LG_SET_OPEN_DRAIN 8
 #define LG_SET_OPEN_SOURCE 16
-#define LG_SET_PULL_UP     32
-#define LG_SET_PULL_DOWN   64
-#define LG_SET_PULL_NONE   128
+#define LG_SET_PULL_UP 32
+#define LG_SET_PULL_DOWN 64
+#define LG_SET_PULL_NONE 128
 
 /* used internally */
 
 #define LG_SET_REALTIME_CLOCK 256
-#define LG_SET_INPUT          512
-#define LG_SET_OUTPUT         1024
+#define LG_SET_INPUT 512
+#define LG_SET_OUTPUT 1024
 
 /* reported GPIO levels */
 
@@ -312,127 +312,116 @@ extern "C" {
 #define LG_TX_PWM 0
 #define LG_TX_WAVE 1
 
-#define LG_MAX_MICS_DEBOUNCE   5000000 /* 5 seconds */
+#define LG_MAX_MICS_DEBOUNCE 5000000   /* 5 seconds */
 #define LG_MAX_MICS_WATCHDOG 300000000 /* 5 minutes */
 
 /* Script constants
-*/
+ */
 
-#define LG_MAX_MICS_DELAY   5e6 /* 5 seconds */
+#define LG_MAX_MICS_DELAY 5e6   /* 5 seconds */
 #define LG_MAX_MILS_DELAY 300e6 /* 5 minutes */
 
 /* script status
-*/
+ */
 
 #define LG_SCRIPT_INITING 0
-#define LG_SCRIPT_READY   1
+#define LG_SCRIPT_READY 1
 #define LG_SCRIPT_RUNNING 2
 #define LG_SCRIPT_WAITING 3
-#define LG_SCRIPT_EXITED  4
-#define LG_SCRIPT_ENDED   5
-#define LG_SCRIPT_HALTED  6
-#define LG_SCRIPT_FAILED  7
+#define LG_SCRIPT_EXITED 4
+#define LG_SCRIPT_ENDED 5
+#define LG_SCRIPT_HALTED 6
+#define LG_SCRIPT_FAILED 7
 
 /* SPI constants
-*/
+ */
 
-#define LG_MAX_SPI_DEVICE_COUNT (1<<16)
+#define LG_MAX_SPI_DEVICE_COUNT (1 << 16)
 
 /* I2C constants
-*/
+ */
 
 /* max lgI2cMsg_t per transaction */
 
-#define  LG_I2C_RDRW_IOCTL_MAX_MSGS 42
+#define LG_I2C_RDRW_IOCTL_MAX_MSGS 42
 
-#define LG_MAX_I2C_DEVICE_COUNT (1<<16)
+#define LG_MAX_I2C_DEVICE_COUNT (1 << 16)
 #define LG_MAX_I2C_ADDR 0x7F
 
 /* i2cZip commands */
 
-#define LG_I2C_END          0
-#define LG_I2C_ESC          1
-#define LG_I2C_ADDR         2
-#define LG_I2C_FLAGS        3
-#define LG_I2C_READ         4
-#define LG_I2C_WRITE        5
+#define LG_I2C_END 0
+#define LG_I2C_ESC 1
+#define LG_I2C_ADDR 2
+#define LG_I2C_FLAGS 3
+#define LG_I2C_READ 4
+#define LG_I2C_WRITE 5
 
 /* types
-*/
+ */
 
-typedef struct lgChipInfo_s
-{
-   uint32_t lines;
-   char name[LG_GPIO_NAME_LEN];   /* Linux name */
-   char label[LG_GPIO_LABEL_LEN]; /* functional name */
+typedef struct lgChipInfo_s {
+  uint32_t lines;
+  char name[LG_GPIO_NAME_LEN];   /* Linux name */
+  char label[LG_GPIO_LABEL_LEN]; /* functional name */
 } lgChipInfo_t, *lgChipInfo_p;
 
-typedef struct
-{
-   uint16_t state;
-   int      fd;
-   int      pipe_number;
-   int      max_emits;
+typedef struct {
+  uint16_t state;
+  int fd;
+  int pipe_number;
+  int max_emits;
 } lgNotify_t;
 
-typedef void (*callbk_t) ();
+typedef void (*callbk_t)();
 
-typedef struct
-{
-   uint64_t timestamp; /* alert time in nanoseconds*/
-   uint8_t chip; /* gpiochip device number */
-   uint8_t gpio; /* offset into gpio device */
-   uint8_t level; /* 0=low, 1=high, 2=watchdog */
-   uint8_t flags; /* none defined, ignore report if non-zero */
+typedef struct {
+  uint64_t timestamp; /* alert time in nanoseconds*/
+  uint8_t chip;       /* gpiochip device number */
+  uint8_t gpio;       /* offset into gpio device */
+  uint8_t level;      /* 0=low, 1=high, 2=watchdog */
+  uint8_t flags;      /* none defined, ignore report if non-zero */
 } lgGpioReport_t;
 
-typedef struct lgGpioAlert_s
-{
-   lgGpioReport_t report;
-   int nfyHandle;
+typedef struct lgGpioAlert_s {
+  lgGpioReport_t report;
+  int nfyHandle;
 } lgGpioAlert_t, *lgGpioAlert_p;
 
-typedef struct lgLineInfo_s
-{
-   uint32_t offset;               /* GPIO number */
-   uint32_t lFlags;
-   char name[LG_GPIO_NAME_LEN];   /* GPIO name */
-   char user[LG_GPIO_USER_LEN];   /* user */
+typedef struct lgLineInfo_s {
+  uint32_t offset; /* GPIO number */
+  uint32_t lFlags;
+  char name[LG_GPIO_NAME_LEN]; /* GPIO name */
+  char user[LG_GPIO_USER_LEN]; /* user */
 } lgLineInfo_t, *lgLineInfo_p;
 
-typedef struct lgPulse_s
-{
-   uint64_t bits;
-   uint64_t mask;
-   int64_t delay;
+typedef struct lgPulse_s {
+  uint64_t bits;
+  uint64_t mask;
+  int64_t delay;
 } lgPulse_t, *lgPulse_p;
 
-typedef struct
-{
-   uint16_t addr;  /* slave address       */
-   uint16_t flags;
-   uint16_t len;   /* msg length          */
-   uint8_t  *buf;  /* pointer to msg data */
+typedef struct {
+  uint16_t addr; /* slave address       */
+  uint16_t flags;
+  uint16_t len; /* msg length          */
+  uint8_t *buf; /* pointer to msg data */
 } lgI2cMsg_t;
 
+typedef void (*lgGpioAlertsFunc_t)(int num_alerts, lgGpioAlert_p alerts,
+                                   void *userdata);
 
-
-typedef void (*lgGpioAlertsFunc_t)  (int           num_alerts,
-                                    lgGpioAlert_p alerts,
-                                    void          *userdata);
-
-typedef void *(lgThreadFunc_t) (void *);
-
+typedef void *(lgThreadFunc_t)(void *);
 
 /* semi-private prototypes
-*/
+ */
 
 const char *lguGetConfigDir(void);
 void lguSetConfigDir(const char *dirPath);
 int lgGpioSetBannedState(int handle, int gpio, int banned);
 
 /* GPIO chip API
-*/
+ */
 
 /*F*/
 int lgGpiochipOpen(int gpioDev);
@@ -514,7 +503,6 @@ if (status == LG_OKAY)
 ...
 D*/
 
-
 /*F*/
 int lgGpioGetLineInfo(int handle, int gpio, lgLineInfo_p lineInfo);
 /*D
@@ -550,7 +538,6 @@ if (status == LG_OKAY)
 }
 ...
 D*/
-
 
 /*F*/
 int lgGpioGetMode(int handle, int gpio);
@@ -592,7 +579,6 @@ The LG bits are only set if the query was made by the process that
 owns the GPIO.
 D*/
 
-
 /*F*/
 int lgGpioSetUser(int handle, const char *gpiouser);
 /*D
@@ -611,7 +597,6 @@ On failure returns a negative error code.
 status = lgGpioSetUser(h, "my_title");
 ...
 D*/
-
 
 /*F*/
 int lgGpioClaimInput(int handle, int lFlags, int gpio);
@@ -636,7 +621,6 @@ as active low, open drain, or open source.
 status = lgGpioClaimInput(h, 0, 23);
 ...
 D*/
-
 
 /*F*/
 int lgGpioClaimOutput(int handle, int lFlags, int gpio, int level);
@@ -665,10 +649,9 @@ status = lgGpioClaimOutput(h, 0, 31, 1);
 ...
 D*/
 
-
 /*F*/
-int lgGpioClaimAlert(
-   int handle, int lFlags, int eFlags, int gpio, int nfyHandle);
+int lgGpioClaimAlert(int handle, int lFlags, int eFlags, int gpio,
+                     int nfyHandle);
 /*D
 This claims a GPIO for alerts on level changes.
 
@@ -725,10 +708,8 @@ status = lgGpioFree(h, 16);
 ...
 D*/
 
-
 /*F*/
-int lgGroupClaimInput(
-   int handle, int lFlags, int count, const int *gpios);
+int lgGroupClaimInput(int handle, int lFlags, int count, const int *gpios);
 /*D
 This claims a group of GPIO for inputs.
 
@@ -765,10 +746,9 @@ else
 ...
 D*/
 
-
 /*F*/
-int lgGroupClaimOutput(
-   int handle, int lFlags, int count, const int *gpios, const int *levels);
+int lgGroupClaimOutput(int handle, int lFlags, int count, const int *gpios,
+                       const int *levels);
 /*D
 This claims a group of GPIO for outputs.
 
@@ -832,7 +812,6 @@ status = lgGroupFree(9); // free buttons
 ...
 D*/
 
-
 /*F*/
 int lgGpioRead(int handle, int gpio);
 /*D
@@ -855,7 +834,6 @@ will be that last written to the GPIO.
 level = lgGpioRead(h, 15); // get level of GPIO 15
 ...
 D*/
-
 
 /*F*/
 int lgGpioWrite(int handle, int gpio, int level);
@@ -883,7 +861,6 @@ status = lgGpioWrite(h, 23, 1); // set GPIO 23 high
 ...
 D*/
 
-
 /*F*/
 int lgGroupRead(int handle, int gpio, uint64_t *groupBits);
 /*D
@@ -908,8 +885,8 @@ as an input or output as that is treated as a group with one member.
 
 After a successful read groupBits is set as follows.
 
-Bit 0 is the level of the group leader. 
-Bit 1 is the level of the second GPIO in the group. 
+Bit 0 is the level of the group leader.
+Bit 1 is the level of the second GPIO in the group.
 Bit x is the level of GPIO x+1 of the group.
 
 ...
@@ -933,10 +910,8 @@ else
 
 D*/
 
-
 /*F*/
-int lgGroupWrite(
-   int handle, int gpio, uint64_t groupBits, uint64_t groupMask);
+int lgGroupWrite(int handle, int gpio, uint64_t groupBits, uint64_t groupMask);
 /*D
 This sets the levels of an output group.
 
@@ -951,11 +926,11 @@ If OK returns 0.
 
 On failure returns a negative error code.
 
-The values of each GPIO of the group are set according to the bits 
+The values of each GPIO of the group are set according to the bits
 of groupBits.
 
-Bit 0 sets the level of the group leader. 
-Bit 1 sets the level of the second GPIO in the group. 
+Bit 0 sets the level of the group leader.
+Bit 1 sets the level of the second GPIO in the group.
 Bit x sets the level of GPIO x+1 in the group.
 
 However this may be modified by the groupMask.  A GPIO is only
@@ -978,15 +953,9 @@ status = lgGroupWrite(h, 15, 32, 32);
 ...
 D*/
 
-
 /*F*/
-int lgTxPulse(
-   int handle,
-   int gpio,
-   int pulseOn,
-   int pulseOff,
-   int pulseOffset,
-   int pulseCycles);
+int lgTxPulse(int handle, int gpio, int pulseOn, int pulseOff, int pulseOffset,
+              int pulseCycles);
 /*D
 This starts software timed pulses on an output GPIO.
 
@@ -1047,13 +1016,8 @@ slots_left = lgTxPulse(h, 30, 2000, 18000, 0, 0); // move servo clockwise
 D*/
 
 /*F*/
-int lgTxPwm(
-   int handle,
-   int gpio,
-   float pwmFrequency,
-   float pwmDutyCycle,
-   int pwmOffset,
-   int pwmCycles);
+int lgTxPwm(int handle, int gpio, float pwmFrequency, float pwmDutyCycle,
+            int pwmOffset, int pwmCycles);
 /*D
 This starts software timed PWM on an output GPIO.
 
@@ -1085,13 +1049,8 @@ Multiple PWM settings may be queued in this way.
 D*/
 
 /*F*/
-int lgTxServo(
-   int handle,
-   int gpio,
-   int pulseWidth,
-   int servoFrequency,
-   int servoOffset,
-   int servoCycles);
+int lgTxServo(int handle, int gpio, int pulseWidth, int servoFrequency,
+              int servoOffset, int servoCycles);
 /*D
 This starts software timed servo pulses on an output GPIO.
 
@@ -1124,10 +1083,8 @@ be replaced by the new settings when all its cycles are compete.
 Multiple servo settings may be queued in this way.
 D*/
 
-
 /*F*/
-int lgTxWave(
-   int handle, int gpio, int count, lgPulse_p pulses);
+int lgTxWave(int handle, int gpio, int count, lgPulse_p pulses);
 /*D
 This starts a wave on an output group of GPIO.
 
@@ -1150,8 +1107,8 @@ pulses is an array of pulses to be transmitted on the group.
 
 Each pulse is defined by the following triplet:
 
-bits:  the levels to set for the selected GPIO 
-mask:  the GPIO to select 
+bits:  the levels to set for the selected GPIO
+mask:  the GPIO to select
 delay: the delay in microseconds before the next pulse
 
 Another wave command may be issued to the group before the
@@ -1321,8 +1278,8 @@ lgSetWatchdogTime(h, 17, 200000); // alert if nothing for 0.2 seconds
 D*/
 
 /*F*/
-int lgGpioSetAlertsFunc(
-   int handle, int gpio, lgGpioAlertsFunc_t cbf, void *userdata);
+int lgGpioSetAlertsFunc(int handle, int gpio, lgGpioAlertsFunc_t cbf,
+                        void *userdata);
 /*D
 This sets up a callback to be called when an alert
 GPIO changes state.
@@ -1339,8 +1296,8 @@ If OK returns 0.
 On failure returns a negative error code.
 
 ...
-#include <stdio.h>
 #include <inttypes.h>
+#include <stdio.h>
 
 #include <lgpio.h>
 
@@ -1393,7 +1350,6 @@ u=123 ts=1602089980694978468 c=0 g=23 l=1 f=0 (1 of 1)
 . .
 D*/
 
-
 /*F*/
 void lgGpioSetSamplesFunc(lgGpioAlertsFunc_t cbf, void *userdata);
 /*D
@@ -1413,8 +1369,8 @@ Note that no handle or gpio is specified.  The callback function will
 receive alerts for all gpiochips and gpio.
 
 ...
-#include <stdio.h>
 #include <inttypes.h>
+#include <stdio.h>
 
 #include <lgpio.h>
 
@@ -1472,12 +1428,12 @@ u=456 ts=1602090898871503652 c=0 g=23 l=1 f=0 (3 of 3)
 D*/
 
 /* Notifications API
-*/
+ */
 
 void lgNotifyCloseOrphans(int slot, int fd);
 int lgNotifyOpenWithSize(int pipeSize);
 
-int  lgNotifyOpenInBand(int fd);
+int lgNotifyOpenInBand(int fd);
 
 /*F*/
 int lgNotifyOpen(void);
@@ -1527,7 +1483,6 @@ else
 ...
 D*/
 
-
 /*F*/
 int lgNotifyResume(int handle);
 /*D
@@ -1557,15 +1512,15 @@ typedef struct
 } lgGpioReport_t;
 . .
 
-timestamp: the number of nanoseconds since a kernel dependent origin. 
- 
+timestamp: the number of nanoseconds since a kernel dependent origin.
+
 Early kernels used to provide a timestamp as the number of nanoseconds
 since the Epoch (start of 1970).  Later kernels use the number of
 nanoseconds since boot.  It's probably best not to make any assumption
 as to the timestamp origin.
 
-level: indicates the level of the GPIO. 
- 
+level: indicates the level of the GPIO.
+
 flags: no flags are currently defined.
 
 For future proofing it is probably best to ignore any notification
@@ -1576,7 +1531,6 @@ with non-zero flags.
 lgNotifyResume(h);
 ...
 D*/
-
 
 /*F*/
 int lgNotifyPause(int handle);
@@ -1598,7 +1552,6 @@ lgNotifyPause(h);
 ...
 D*/
 
-
 /*F*/
 int lgNotifyClose(int handle);
 /*D
@@ -1617,9 +1570,8 @@ lgNotifyClose(h);
 ...
 D*/
 
-
 /* I2C API
-*/
+ */
 
 /*F*/
 int lgI2cOpen(int i2cDev, int i2cAddr, int i2cFlags);
@@ -1655,7 +1607,6 @@ Count  (8 bits): A byte defining the length of a block operation
 . .
 D*/
 
-
 /*F*/
 int lgI2cClose(int handle);
 /*D
@@ -1669,7 +1620,6 @@ If OK returns 0.
 
 On failure returns a negative error code.
 D*/
-
 
 /*F*/
 int lgI2cWriteQuick(int handle, int bitVal);
@@ -1691,7 +1641,6 @@ S Addr bit [A] P
 . .
 D*/
 
-
 /*F*/
 int lgI2cWriteByte(int handle, int byteVal);
 /*D
@@ -1712,7 +1661,6 @@ S Addr Wr [A] bVal [A] P
 . .
 D*/
 
-
 /*F*/
 int lgI2cReadByte(int handle);
 /*D
@@ -1731,7 +1679,6 @@ Receive byte. SMBus 2.0 5.5.3
 S Addr Rd [A] [Data] NA P
 . .
 D*/
-
 
 /*F*/
 int lgI2cWriteByteData(int handle, int i2cReg, int byteVal);
@@ -1754,7 +1701,6 @@ S Addr Wr [A] i2cReg [A] bVal [A] P
 . .
 D*/
 
-
 /*F*/
 int lgI2cWriteWordData(int handle, int i2cReg, int wordVal);
 /*D
@@ -1776,7 +1722,6 @@ S Addr Wr [A] i2cReg [A] wValLow [A] wValHigh [A] P
 . .
 D*/
 
-
 /*F*/
 int lgI2cReadByteData(int handle, int i2cReg);
 /*D
@@ -1797,7 +1742,6 @@ S Addr Wr [A] i2cReg [A] S Addr Rd [A] [Data] NA P
 . .
 D*/
 
-
 /*F*/
 int lgI2cReadWordData(int handle, int i2cReg);
 /*D
@@ -1817,7 +1761,6 @@ Read word. SMBus 2.0 5.5.5
 S Addr Wr [A] i2cReg [A] S Addr Rd [A] [DataLow] A [DataHigh] NA P
 . .
 D*/
-
 
 /*F*/
 int lgI2cProcessCall(int handle, int i2cReg, int wordVal);
@@ -1842,7 +1785,6 @@ S Addr Wr [A] i2cReg [A] wValLow [A] wValHigh [A]
 . .
 D*/
 
-
 /*F*/
 int lgI2cWriteBlockData(int handle, int i2cReg, const char *txBuf, int count);
 /*D
@@ -1865,7 +1807,6 @@ S Addr Wr [A] i2cReg [A] count [A]
    txBuf0 [A] txBuf1 [A] ... [A] txBufn [A] P
 . .
 D*/
-
 
 /*F*/
 int lgI2cReadBlockData(int handle, int i2cReg, char *rxBuf);
@@ -1892,10 +1833,8 @@ S Addr Wr [A] i2cReg [A]
 . .
 D*/
 
-
 /*F*/
-int lgI2cBlockProcessCall(
-   int handle, int i2cReg, char *ioBuf, int count);
+int lgI2cBlockProcessCall(int handle, int i2cReg, char *ioBuf, int count);
 /*D
 This writes data bytes to the specified register of the device
 and reads a device specified number of bytes of data in return.
@@ -1922,7 +1861,6 @@ S Addr Wr [A] i2cReg [A] count [A] ioBuf0 [A] ... ioBufn [A]
 . .
 D*/
 
-
 /*F*/
 int lgI2cReadI2CBlockData(int handle, int i2cReg, char *rxBuf, int count);
 /*D
@@ -1946,9 +1884,9 @@ S Addr Wr [A] i2cReg [A]
 . .
 D*/
 
-
 /*F*/
-int lgI2cWriteI2CBlockData(int handle, int i2cReg, const char *txBuf, int count);
+int lgI2cWriteI2CBlockData(int handle, int i2cReg, const char *txBuf,
+                           int count);
 /*D
 This writes 1 to 32 bytes to the specified register of the device.
 
@@ -1988,7 +1926,6 @@ S Addr Rd [A] [rxBuf0] A [rxBuf1] A ... A [rxBufn] NA P
 . .
 D*/
 
-
 /*F*/
 int lgI2cWriteDevice(int handle, const char *txBuf, int count);
 /*D
@@ -2027,8 +1964,8 @@ On failure returns a negative error code.
 D*/
 
 /*F*/
-int lgI2cZip(
-   int handle, const char *txBuf, int txCount, char *rxBuf, int rxCount);
+int lgI2cZip(int handle, const char *txBuf, int txCount, char *rxBuf,
+             int rxCount);
 /*D
 This function executes a sequence of I2C operations.  The
 operations to be performed are specified by the contents of txBuf
@@ -2081,7 +2018,7 @@ End
 D*/
 
 /* Serial API
-*/
+ */
 
 /*F*/
 int lgSerialOpen(const char *serDev, int serBaud, int serFlags);
@@ -2105,7 +2042,6 @@ The baud rate must be one of 50, 75, 110, 134, 150,
 
 No flags are currently defined.  This parameter should be set to zero.
 D*/
-
 
 /*F*/
 int lgSerialClose(int handle);
@@ -2166,7 +2102,6 @@ If OK returns 0.
 On failure returns a negative error code.
 D*/
 
-
 /*F*/
 int lgSerialRead(int handle, char *rxBuf, int count);
 /*D
@@ -2185,7 +2120,6 @@ On failure returns a negative error code.
 
 D*/
 
-
 /*F*/
 int lgSerialDataAvailable(int handle);
 /*D
@@ -2202,7 +2136,7 @@ On failure returns a negative error code.
 D*/
 
 /* SPI API
-*/
+ */
 
 /*F*/
 int lgSpiOpen(int spiDev, int spiChan, int spiBaud, int spiFlags);
@@ -2256,7 +2190,6 @@ If OK returns 0.
 On failure returns a negative error code.
 D*/
 
-
 /*F*/
 int lgSpiRead(int handle, char *rxBuf, int count);
 /*D
@@ -2273,7 +2206,6 @@ If OK returns the count of bytes read and updates rxBuf.
 
 On failure returns a negative error code.
 D*/
-
 
 /*F*/
 int lgSpiWrite(int handle, const char *txBuf, int count);
@@ -2311,9 +2243,8 @@ If OK returns the count of bytes transferred and updates rxBuf.
 On failure returns a negative error code.
 D*/
 
-
 /* Threads API
-*/
+ */
 
 /*F*/
 pthread_t *lgThreadStart(lgThreadFunc_t f, void *userdata);
@@ -2335,9 +2266,9 @@ The thread can be cancelled by passing the pointer to pthread_t to
 [*lgThreadStop*].
 
 ...
+#include <lgpio.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <lgpio.h>
 
 void *myfunc(void *arg)
 {
@@ -2367,7 +2298,6 @@ int main(int argc, char *argv[])
 ...
 D*/
 
-
 /*F*/
 void lgThreadStop(pthread_t *pth);
 /*D
@@ -2381,7 +2311,7 @@ No value is returned.
 
 The thread to be stopped should have been started with [*lgThreadStart*].
 D*/
-   
+
 /*F*/
 uint64_t lguTimestamp(void);
 /*D
@@ -2409,7 +2339,6 @@ Sleeps for the specified number of seconds.
 sleepSecs: how long to sleep in seconds
 . .
 D*/
-
 
 /*F*/
 int lguSbcName(char *rxBuf, int count);
@@ -2598,10 +2527,10 @@ handle:: >= 0
 
 A number referencing an object opened by one of
 
-[*lgGpiochipOpen*] 
-[*lgI2cOpen*] 
-[*lgNotifyOpen*] 
-[*lgSerialOpen*] 
+[*lgGpiochipOpen*]
+[*lgI2cOpen*]
+[*lgNotifyOpen*]
+[*lgSerialOpen*]
 [*lgSpiOpen*]
 
 i2cAddr:: 0-0x7F
@@ -2843,10 +2772,10 @@ following technique.
 In the calling function:
 
 . .
-user_type *userdata; 
+user_type *userdata;
 user_type my_userdata;
 
-userdata = malloc(sizeof(user_type)); 
+userdata = malloc(sizeof(user_type));
 *userdata = my_userdata;
 . .
 
@@ -2871,115 +2800,113 @@ PARAMS*/
 
 /*DEF_S Error Codes*/
 
-#define LG_OKAY                   0 // No error
-#define LG_INIT_FAILED           -1 // initialisation failed
-#define LG_BAD_MICROS            -2 // micros not 0-999999
-#define LG_BAD_PATHNAME          -3 // can not open pathname
-#define LG_NO_HANDLE             -4 // no handle available
-#define LG_BAD_HANDLE            -5 // unknown handle
-#define LG_BAD_SOCKET_PORT       -6 // socket port not 1024-32000
-#define LG_NOT_PERMITTED         -7 // GPIO operation not permitted
-#define LG_SOME_PERMITTED        -8 // one or more GPIO not permitted
-#define LG_BAD_SCRIPT            -9 // invalid script
-#define LG_BAD_TX_TYPE          -10 // bad tx type for GPIO and group
-#define LG_GPIO_IN_USE          -11 // GPIO already in use
-#define LG_BAD_PARAM_NUM        -12 // script parameter id not 0-9
-#define LG_DUP_TAG              -13 // script has duplicate tag
-#define LG_TOO_MANY_TAGS        -14 // script has too many tags
-#define LG_BAD_SCRIPT_CMD       -15 // illegal script command
-#define LG_BAD_VAR_NUM          -16 // script variable id not 0-149
-#define LG_NO_SCRIPT_ROOM       -17 // no more room for scripts
-#define LG_NO_MEMORY            -18 // can not allocate temporary memory
-#define LG_SOCK_READ_FAILED     -19 // socket read failed
-#define LG_SOCK_WRIT_FAILED     -20 // socket write failed
-#define LG_TOO_MANY_PARAM       -21 // too many script parameters (> 10)
-#define LG_SCRIPT_NOT_READY     -22 // script initialising
-#define LG_BAD_TAG              -23 // script has unresolved tag
-#define LG_BAD_MICS_DELAY       -24 // bad MICS delay (too large)
-#define LG_BAD_MILS_DELAY       -25 // bad MILS delay (too large)
-#define LG_I2C_OPEN_FAILED      -26 // can not open I2C device
-#define LG_SERIAL_OPEN_FAILED   -27 // can not open serial device
-#define LG_SPI_OPEN_FAILED      -28 // can not open SPI device
-#define LG_BAD_I2C_BUS          -29 // bad I2C bus
-#define LG_BAD_I2C_ADDR         -30 // bad I2C address
-#define LG_BAD_SPI_CHANNEL      -31 // bad SPI channel
-#define LG_BAD_I2C_FLAGS        -32 // bad I2C open flags
-#define LG_BAD_SPI_FLAGS        -33 // bad SPI open flags
-#define LG_BAD_SERIAL_FLAGS     -34 // bad serial open flags
-#define LG_BAD_SPI_SPEED        -35 // bad SPI speed
-#define LG_BAD_SERIAL_DEVICE    -36 // bad serial device name
-#define LG_BAD_SERIAL_SPEED     -37 // bad serial baud rate
-#define LG_BAD_FILE_PARAM       -38 // bad file parameter
-#define LG_BAD_I2C_PARAM        -39 // bad I2C parameter
-#define LG_BAD_SERIAL_PARAM     -40 // bad serial parameter
-#define LG_I2C_WRITE_FAILED     -41 // i2c write failed
-#define LG_I2C_READ_FAILED      -42 // i2c read failed
-#define LG_BAD_SPI_COUNT        -43 // bad SPI count
-#define LG_SERIAL_WRITE_FAILED  -44 // ser write failed
-#define LG_SERIAL_READ_FAILED   -45 // ser read failed
-#define LG_SERIAL_READ_NO_DATA  -46 // ser read no data available
-#define LG_UNKNOWN_COMMAND      -47 // unknown command
-#define LG_SPI_XFER_FAILED      -48 // spi xfer/read/write failed
-#define LG_BAD_POINTER          -49 // bad (NULL) pointer
-#define LG_MSG_TOOBIG           -50 // socket/pipe message too big
-#define LG_BAD_MALLOC_MODE      -51 // bad memory allocation mode
-#define LG_TOO_MANY_SEGS        -52 // too many I2C transaction segments
-#define LG_BAD_I2C_SEG          -53 // an I2C transaction segment failed
-#define LG_BAD_SMBUS_CMD        -54 // SMBus command not supported by driver
-#define LG_BAD_I2C_WLEN         -55 // bad I2C write length
-#define LG_BAD_I2C_RLEN         -56 // bad I2C read length
-#define LG_BAD_I2C_CMD          -57 // bad I2C command
-#define LG_FILE_OPEN_FAILED     -58 // file open failed
-#define LG_BAD_FILE_MODE        -59 // bad file mode
-#define LG_BAD_FILE_FLAG        -60 // bad file flag
-#define LG_BAD_FILE_READ        -61 // bad file read
-#define LG_BAD_FILE_WRITE       -62 // bad file write
-#define LG_FILE_NOT_ROPEN       -63 // file not open for read
-#define LG_FILE_NOT_WOPEN       -64 // file not open for write
-#define LG_BAD_FILE_SEEK        -65 // bad file seek
-#define LG_NO_FILE_MATCH        -66 // no files match pattern
-#define LG_NO_FILE_ACCESS       -67 // no permission to access file
-#define LG_FILE_IS_A_DIR        -68 // file is a directory
-#define LG_BAD_SHELL_STATUS     -69 // bad shell return status
-#define LG_BAD_SCRIPT_NAME      -70 // bad script name
-#define LG_CMD_INTERRUPTED      -71 // Python socket command interrupted
-#define LG_BAD_EVENT_REQUEST    -72 // bad event request
-#define LG_BAD_GPIO_NUMBER      -73 // bad GPIO number
-#define LG_BAD_GROUP_SIZE       -74 // bad group size
-#define LG_BAD_LINEINFO_IOCTL   -75 // bad lineinfo IOCTL
-#define LG_BAD_READ             -76 // bad GPIO read
-#define LG_BAD_WRITE            -77 // bad GPIO write
-#define LG_CANNOT_OPEN_CHIP     -78 // can not open gpiochip
-#define LG_GPIO_BUSY            -79 // GPIO busy
-#define LG_GPIO_NOT_ALLOCATED   -80 // GPIO not allocated
-#define LG_NOT_A_GPIOCHIP       -81 // not a gpiochip
-#define LG_NOT_ENOUGH_MEMORY    -82 // not enough memory
-#define LG_POLL_FAILED          -83 // GPIO poll failed
-#define LG_TOO_MANY_GPIOS       -84 // too many GPIO
-#define LG_UNEGPECTED_ERROR     -85 // unexpected error
-#define LG_BAD_PWM_MICROS       -86 // bad PWM micros
-#define LG_NOT_GROUP_LEADER     -87 // GPIO not the group leader
-#define LG_SPI_IOCTL_FAILED     -88 // SPI iOCTL failed
-#define LG_BAD_GPIOCHIP         -89 // bad gpiochip
-#define LG_BAD_CHIPINFO_IOCTL   -90 // bad chipinfo IOCTL
-#define LG_BAD_CONFIG_FILE      -91 // bad configuration file
-#define LG_BAD_CONFIG_VALUE     -92 // bad configuration value
-#define LG_NO_PERMISSIONS       -93 // no permission to perform action
-#define LG_BAD_USERNAME         -94 // bad user name
-#define LG_BAD_SECRET           -95 // bad secret for user
-#define LG_TX_QUEUE_FULL        -96 // TX queue full
-#define LG_BAD_CONFIG_ID        -97 // bad configuration id
-#define LG_BAD_DEBOUNCE_MICS    -98 // bad debounce microseconds
-#define LG_BAD_WATCHDOG_MICS    -99 // bad watchdog microseconds
-#define LG_BAD_SERVO_FREQ      -100 // bad servo frequency
-#define LG_BAD_SERVO_WIDTH     -101 // bad servo pulsewidth
-#define LG_BAD_PWM_FREQ        -102 // bad PWM frequency
-#define LG_BAD_PWM_DUTY        -103 // bad PWM dutycycle
-#define LG_GPIO_NOT_AN_OUTPUT  -104 // GPIO not set as an output
+#define LG_OKAY 0                   // No error
+#define LG_INIT_FAILED -1           // initialisation failed
+#define LG_BAD_MICROS -2            // micros not 0-999999
+#define LG_BAD_PATHNAME -3          // can not open pathname
+#define LG_NO_HANDLE -4             // no handle available
+#define LG_BAD_HANDLE -5            // unknown handle
+#define LG_BAD_SOCKET_PORT -6       // socket port not 1024-32000
+#define LG_NOT_PERMITTED -7         // GPIO operation not permitted
+#define LG_SOME_PERMITTED -8        // one or more GPIO not permitted
+#define LG_BAD_SCRIPT -9            // invalid script
+#define LG_BAD_TX_TYPE -10          // bad tx type for GPIO and group
+#define LG_GPIO_IN_USE -11          // GPIO already in use
+#define LG_BAD_PARAM_NUM -12        // script parameter id not 0-9
+#define LG_DUP_TAG -13              // script has duplicate tag
+#define LG_TOO_MANY_TAGS -14        // script has too many tags
+#define LG_BAD_SCRIPT_CMD -15       // illegal script command
+#define LG_BAD_VAR_NUM -16          // script variable id not 0-149
+#define LG_NO_SCRIPT_ROOM -17       // no more room for scripts
+#define LG_NO_MEMORY -18            // can not allocate temporary memory
+#define LG_SOCK_READ_FAILED -19     // socket read failed
+#define LG_SOCK_WRIT_FAILED -20     // socket write failed
+#define LG_TOO_MANY_PARAM -21       // too many script parameters (> 10)
+#define LG_SCRIPT_NOT_READY -22     // script initialising
+#define LG_BAD_TAG -23              // script has unresolved tag
+#define LG_BAD_MICS_DELAY -24       // bad MICS delay (too large)
+#define LG_BAD_MILS_DELAY -25       // bad MILS delay (too large)
+#define LG_I2C_OPEN_FAILED -26      // can not open I2C device
+#define LG_SERIAL_OPEN_FAILED -27   // can not open serial device
+#define LG_SPI_OPEN_FAILED -28      // can not open SPI device
+#define LG_BAD_I2C_BUS -29          // bad I2C bus
+#define LG_BAD_I2C_ADDR -30         // bad I2C address
+#define LG_BAD_SPI_CHANNEL -31      // bad SPI channel
+#define LG_BAD_I2C_FLAGS -32        // bad I2C open flags
+#define LG_BAD_SPI_FLAGS -33        // bad SPI open flags
+#define LG_BAD_SERIAL_FLAGS -34     // bad serial open flags
+#define LG_BAD_SPI_SPEED -35        // bad SPI speed
+#define LG_BAD_SERIAL_DEVICE -36    // bad serial device name
+#define LG_BAD_SERIAL_SPEED -37     // bad serial baud rate
+#define LG_BAD_FILE_PARAM -38       // bad file parameter
+#define LG_BAD_I2C_PARAM -39        // bad I2C parameter
+#define LG_BAD_SERIAL_PARAM -40     // bad serial parameter
+#define LG_I2C_WRITE_FAILED -41     // i2c write failed
+#define LG_I2C_READ_FAILED -42      // i2c read failed
+#define LG_BAD_SPI_COUNT -43        // bad SPI count
+#define LG_SERIAL_WRITE_FAILED -44  // ser write failed
+#define LG_SERIAL_READ_FAILED -45   // ser read failed
+#define LG_SERIAL_READ_NO_DATA -46  // ser read no data available
+#define LG_UNKNOWN_COMMAND -47      // unknown command
+#define LG_SPI_XFER_FAILED -48      // spi xfer/read/write failed
+#define LG_BAD_POINTER -49          // bad (NULL) pointer
+#define LG_MSG_TOOBIG -50           // socket/pipe message too big
+#define LG_BAD_MALLOC_MODE -51      // bad memory allocation mode
+#define LG_TOO_MANY_SEGS -52        // too many I2C transaction segments
+#define LG_BAD_I2C_SEG -53          // an I2C transaction segment failed
+#define LG_BAD_SMBUS_CMD -54        // SMBus command not supported by driver
+#define LG_BAD_I2C_WLEN -55         // bad I2C write length
+#define LG_BAD_I2C_RLEN -56         // bad I2C read length
+#define LG_BAD_I2C_CMD -57          // bad I2C command
+#define LG_FILE_OPEN_FAILED -58     // file open failed
+#define LG_BAD_FILE_MODE -59        // bad file mode
+#define LG_BAD_FILE_FLAG -60        // bad file flag
+#define LG_BAD_FILE_READ -61        // bad file read
+#define LG_BAD_FILE_WRITE -62       // bad file write
+#define LG_FILE_NOT_ROPEN -63       // file not open for read
+#define LG_FILE_NOT_WOPEN -64       // file not open for write
+#define LG_BAD_FILE_SEEK -65        // bad file seek
+#define LG_NO_FILE_MATCH -66        // no files match pattern
+#define LG_NO_FILE_ACCESS -67       // no permission to access file
+#define LG_FILE_IS_A_DIR -68        // file is a directory
+#define LG_BAD_SHELL_STATUS -69     // bad shell return status
+#define LG_BAD_SCRIPT_NAME -70      // bad script name
+#define LG_CMD_INTERRUPTED -71      // Python socket command interrupted
+#define LG_BAD_EVENT_REQUEST -72    // bad event request
+#define LG_BAD_GPIO_NUMBER -73      // bad GPIO number
+#define LG_BAD_GROUP_SIZE -74       // bad group size
+#define LG_BAD_LINEINFO_IOCTL -75   // bad lineinfo IOCTL
+#define LG_BAD_READ -76             // bad GPIO read
+#define LG_BAD_WRITE -77            // bad GPIO write
+#define LG_CANNOT_OPEN_CHIP -78     // can not open gpiochip
+#define LG_GPIO_BUSY -79            // GPIO busy
+#define LG_GPIO_NOT_ALLOCATED -80   // GPIO not allocated
+#define LG_NOT_A_GPIOCHIP -81       // not a gpiochip
+#define LG_NOT_ENOUGH_MEMORY -82    // not enough memory
+#define LG_POLL_FAILED -83          // GPIO poll failed
+#define LG_TOO_MANY_GPIOS -84       // too many GPIO
+#define LG_UNEGPECTED_ERROR -85     // unexpected error
+#define LG_BAD_PWM_MICROS -86       // bad PWM micros
+#define LG_NOT_GROUP_LEADER -87     // GPIO not the group leader
+#define LG_SPI_IOCTL_FAILED -88     // SPI iOCTL failed
+#define LG_BAD_GPIOCHIP -89         // bad gpiochip
+#define LG_BAD_CHIPINFO_IOCTL -90   // bad chipinfo IOCTL
+#define LG_BAD_CONFIG_FILE -91      // bad configuration file
+#define LG_BAD_CONFIG_VALUE -92     // bad configuration value
+#define LG_NO_PERMISSIONS -93       // no permission to perform action
+#define LG_BAD_USERNAME -94         // bad user name
+#define LG_BAD_SECRET -95           // bad secret for user
+#define LG_TX_QUEUE_FULL -96        // TX queue full
+#define LG_BAD_CONFIG_ID -97        // bad configuration id
+#define LG_BAD_DEBOUNCE_MICS -98    // bad debounce microseconds
+#define LG_BAD_WATCHDOG_MICS -99    // bad watchdog microseconds
+#define LG_BAD_SERVO_FREQ -100      // bad servo frequency
+#define LG_BAD_SERVO_WIDTH -101     // bad servo pulsewidth
+#define LG_BAD_PWM_FREQ -102        // bad PWM frequency
+#define LG_BAD_PWM_DUTY -103        // bad PWM dutycycle
+#define LG_GPIO_NOT_AN_OUTPUT -104  // GPIO not set as an output
 #define LG_INVALID_GROUP_ALERT -105 // can not set a group to alert
 
 /*DEF_E*/
 
-
 #endif
-

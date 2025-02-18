@@ -26,8 +26,8 @@ For more information, please refer to <http://unlicense.org/>
 */
 
 #include <inttypes.h>
-#include <time.h>
 #include <sys/time.h>
+#include <time.h>
 
 #include "lgpio.h"
 
@@ -37,93 +37,95 @@ For more information, please refer to <http://unlicense.org/>
 
 uint64_t lgDbgLevel = LG_DEBUG_ALWAYS;
 
-char *lgDbgStr2Hex(int count, const char *buf)
-{
-   static char str[LG_DBG_MAX_BUFS][128];
-   static int which = 0;
+char *lgDbgStr2Hex(int count, const char *buf) {
+  static char str[LG_DBG_MAX_BUFS][128];
+  static int which = 0;
 
-   int i, c;
+  int i, c;
 
-   if (++which >= LG_DBG_MAX_BUFS) which = 0;
+  if (++which >= LG_DBG_MAX_BUFS)
+    which = 0;
 
-   if (count && buf)
-   {
-      if (count > 40) c = 40; else c = count;
+  if (count && buf) {
+    if (count > 40)
+      c = 40;
+    else
+      c = count;
 
-      for (i=0; i<c; i++) sprintf(str[which]+(3*i), "%02X ", (unsigned)buf[i]);
-      str[which][(3*c)-1] = 0;
-   }
-   else str[which][0] = 0;
+    for (i = 0; i < c; i++)
+      sprintf(str[which] + (3 * i), "%02X ", (unsigned)buf[i]);
+    str[which][(3 * c) - 1] = 0;
+  } else
+    str[which][0] = 0;
 
-   return str[which];
+  return str[which];
 }
 
 /* ----------------------------------------------------------------------- */
 
-char *lgDbgInt2Str(int count, const int *buf)
-{
-   static char str[LG_DBG_MAX_BUFS][128];
-   static int which = 0;
+char *lgDbgInt2Str(int count, const int *buf) {
+  static char str[LG_DBG_MAX_BUFS][128];
+  static int which = 0;
 
-   int i, pos;
+  int i, pos;
 
-   if (++which >= LG_DBG_MAX_BUFS) which = 0;
+  if (++which >= LG_DBG_MAX_BUFS)
+    which = 0;
 
-   if (count && buf)
-   {
-      pos = 0;
+  if (count && buf) {
+    pos = 0;
 
-      for (i=0; i<count; i++)
-      {
-         pos += sprintf(str[which]+pos, "%d ", buf[i]);
-         str[which][pos] = 0;
-         if (pos > 100) break;
-      }
-   }
-   else str[which][0] = 0;
+    for (i = 0; i < count; i++) {
+      pos += sprintf(str[which] + pos, "%d ", buf[i]);
+      str[which][pos] = 0;
+      if (pos > 100)
+        break;
+    }
+  } else
+    str[which][0] = 0;
 
-   return str[which];
+  return str[which];
 }
 
-char *lgDbgTimeStamp(void)
-{
-   static struct timeval last;
-   static char buf[LG_DBG_MAX_BUFS][32];
-   static int which = 0;
-   struct timeval now;
-   struct tm tmp;
+char *lgDbgTimeStamp(void) {
+  static struct timeval last;
+  static char buf[LG_DBG_MAX_BUFS][32];
+  static int which = 0;
+  struct timeval now;
+  struct tm tmp;
 
+  gettimeofday(&now, NULL);
 
-   gettimeofday(&now, NULL);
+  if (now.tv_sec != last.tv_sec) {
+    if (++which >= LG_DBG_MAX_BUFS)
+      which = 0;
+    localtime_r(&now.tv_sec, &tmp);
+    strftime(buf[which], sizeof(buf[0]), "%F %T", &tmp);
+    last.tv_sec = now.tv_sec;
+  }
 
-   if (now.tv_sec != last.tv_sec)
-   {
-      if (++which >= LG_DBG_MAX_BUFS) which = 0;
-      localtime_r(&now.tv_sec, &tmp);
-      strftime(buf[which], sizeof(buf[0]), "%F %T", &tmp);
-      last.tv_sec = now.tv_sec;
-   }
-
-   return buf[which];
+  return buf[which];
 }
 
-char *lgDbgBuf2Str(int count, const char *buf)
-{
-   static char str[LG_DBG_MAX_BUFS][128];
-   static int which = 0;
-   int i, c;
+char *lgDbgBuf2Str(int count, const char *buf) {
+  static char str[LG_DBG_MAX_BUFS][128];
+  static int which = 0;
+  int i, c;
 
-   if (++which >= LG_DBG_MAX_BUFS) which = 0;
+  if (++which >= LG_DBG_MAX_BUFS)
+    which = 0;
 
-   if (count && buf)
-   {
-      if (count > 40) c = 40; else c = count;
+  if (count && buf) {
+    if (count > 40)
+      c = 40;
+    else
+      c = count;
 
-      for (i=0; i<c; i++) sprintf(str[which]+(3*i), "%02X ", (unsigned)buf[i]);
-      str[which][(3*c)-1] = 0;
-   }
-   else str[which][0] = 0;
+    for (i = 0; i < c; i++)
+      sprintf(str[which] + (3 * i), "%02X ", (unsigned)buf[i]);
+    str[which][(3 * c) - 1] = 0;
+  } else
+    str[which][0] = 0;
 
-   return str[which];
+  return str[which];
 }
-

@@ -30,52 +30,43 @@ For more information, please refer to <http://unlicense.org/>
 
 #include <pthread.h>
 
-#include "lgpio.h"
 #include "lgGpio.h"
+#include "lgpio.h"
 
 #define LG_TX_BUF 10
 
-typedef struct lgTxRec_s
-{
-   int active;
-   struct lgTxRec_s *prev;
-   struct lgTxRec_s *next;
-   int next_micros;
-   lgChipObj_p chip;
-   int gpio;
-   int entries; /* number of entries in LG_TX_BUF arrays */
-   int type;    /* PWM or WAVE */
-   union
-   {
-      struct
-      {
-         int micros_on[LG_TX_BUF];
-         int micros_off[LG_TX_BUF];
-         int cycles[LG_TX_BUF];
-         int micros_offset; // start offset micros into cycle
-         int next_level;
-      };
-      struct
-      {
-         lgPulse_p pulses[LG_TX_BUF];
-         int num_pulses[LG_TX_BUF];
-         int pulse_pos;
-      };
-   };
+typedef struct lgTxRec_s {
+  int active;
+  struct lgTxRec_s *prev;
+  struct lgTxRec_s *next;
+  int next_micros;
+  lgChipObj_p chip;
+  int gpio;
+  int entries; /* number of entries in LG_TX_BUF arrays */
+  int type;    /* PWM or WAVE */
+  union {
+    struct {
+      int micros_on[LG_TX_BUF];
+      int micros_off[LG_TX_BUF];
+      int cycles[LG_TX_BUF];
+      int micros_offset; // start offset micros into cycle
+      int next_level;
+    };
+    struct {
+      lgPulse_p pulses[LG_TX_BUF];
+      int num_pulses[LG_TX_BUF];
+      int pulse_pos;
+    };
+  };
 } lgTxRec_t, *lgTxRec_p;
 
 lgTxRec_p lgGpioGetTxRec(lgChipObj_p chip, int gpio, int type);
 
-lgTxRec_p lgGpioCreateTxRec(
-   lgChipObj_p chip,
-   int gpio,
-   int micros_on,
-   int micros_off,
-   int micros_offset,
-   int cycles);
+lgTxRec_p lgGpioCreateTxRec(lgChipObj_p chip, int gpio, int micros_on,
+                            int micros_off, int micros_offset, int cycles);
 
-lgTxRec_p lgGroupCreateWaveRec(
-   lgChipObj_p chip, int gpio, int count, lgPulse_p pulses);
+lgTxRec_p lgGroupCreateWaveRec(lgChipObj_p chip, int gpio, int count,
+                               lgPulse_p pulses);
 
 void lgPthTxStart(void);
 void lgPthTxStop(lgChipObj_p chip);
@@ -83,4 +74,3 @@ void lgPthTxLock(void);
 void lgPthTxUnlock(void);
 
 #endif
-

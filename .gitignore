@@ -1,4 +1,5 @@
 build/
+eink
 
 # Prerequisites
 *.d

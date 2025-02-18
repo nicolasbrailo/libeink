@@ -25,64 +25,52 @@ OTHER DEALINGS IN THE SOFTWARE.
 For more information, please refer to <http://unlicense.org/>
 */
 
-#include <stdlib.h>
 #include <inttypes.h>
+#include <stdlib.h>
 
 #include "lgpio.h"
 
 #include "lgDbg.h"
 
-pthread_t *lgThreadStart(lgThreadFunc_t f, void *userdata)
-{
-   pthread_t *pth;
-   pthread_attr_t pthAttr;
+pthread_t *lgThreadStart(lgThreadFunc_t f, void *userdata) {
+  pthread_t *pth;
+  pthread_attr_t pthAttr;
 
-   LG_DBG(LG_DEBUG_TRACE, "f=%08"PRIXPTR", userdata=%08"PRIXPTR,
-      (uintptr_t)f, (uintptr_t)userdata);
+  LG_DBG(LG_DEBUG_TRACE, "f=%08" PRIXPTR ", userdata=%08" PRIXPTR, (uintptr_t)f,
+         (uintptr_t)userdata);
 
-   pth = malloc(sizeof(pthread_t));
+  pth = malloc(sizeof(pthread_t));
 
-   if (pth)
-   {
-      if (pthread_attr_init(&pthAttr))
-      {
-         free(pth);
-         PARAM_ERROR(NULL, "pthread_attr_init failed");
-      }
+  if (pth) {
+    if (pthread_attr_init(&pthAttr)) {
+      free(pth);
+      PARAM_ERROR(NULL, "pthread_attr_init failed");
+    }
 
-      if (pthread_attr_setstacksize(&pthAttr, STACK_SIZE))
-      {
-         free(pth);
-         PARAM_ERROR(NULL, "pthread_attr_setstacksize failed");
-      }
+    if (pthread_attr_setstacksize(&pthAttr, STACK_SIZE)) {
+      free(pth);
+      PARAM_ERROR(NULL, "pthread_attr_setstacksize failed");
+    }
 
-      if (pthread_create(pth, &pthAttr, f, userdata))
-      {
-         free(pth);
-         PARAM_ERROR(NULL, "pthread_create failed");
-      }
-   }
-   return pth;
+    if (pthread_create(pth, &pthAttr, f, userdata)) {
+      free(pth);
+      PARAM_ERROR(NULL, "pthread_create failed");
+    }
+  }
+  return pth;
 }
 
+void lgThreadStop(pthread_t *pth) {
+  LG_DBG(LG_DEBUG_TRACE, "pth=%08" PRIXPTR, (uintptr_t)pth);
 
-void lgThreadStop(pthread_t *pth)
-{
-   LG_DBG(LG_DEBUG_TRACE, "pth=%08"PRIXPTR, (uintptr_t)pth);
-
-   if (pth)
-   {
-      if (pthread_self() == *pth)
-      {
-         free(pth);
-         pthread_exit(NULL);
-      }
-      else
-      {
-         pthread_cancel(*pth);
-         pthread_join(*pth, NULL);
-         free(pth);
-      }
-   }
+  if (pth) {
+    if (pthread_self() == *pth) {
+      free(pth);
+      pthread_exit(NULL);
+    } else {
+      pthread_cancel(*pth);
+      pthread_join(*pth, NULL);
+      free(pth);
+    }
+  }
 }
-

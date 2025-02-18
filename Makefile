@@ -67,11 +67,6 @@ eink: \
 	clang $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 
-to_rm_objs:
-		build/fonts/font12CN.o \
-		build/fonts/font24CN.o \
-
-
 clean:
 	rm -rf build
 
@@ -90,3 +85,8 @@ xcompile-end:
 
 install_sysroot_deps:
 	true
+
+run: eink
+	#scp eink StoneBakedMargheritaHomeboard:/home/batman/eink
+	ssh StoneBakedMargheritaHomeboard /home/batman/eink/eink
+

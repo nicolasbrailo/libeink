@@ -30,41 +30,38 @@ For more information, please refer to <http://unlicense.org/>
 
 #include "lgpio.h"
 
-typedef struct lgLineInf_s
-{
-   int      banned;
-   int      mode;
-   int      eFlags;
-   int      group_size;
-   int      fd;
-   int      debounce_us;
-   int      watchdog_us;
-   callbk_t alertFunc;
-   void     *userdata;
-   uint32_t offset;
-   uint32_t *offsets_p;
-   uint64_t *values_p; /* redundant to store values with gpiochip API2  */
-                       /* kept in case it is needed again in the future */
+typedef struct lgLineInf_s {
+  int banned;
+  int mode;
+  int eFlags;
+  int group_size;
+  int fd;
+  int debounce_us;
+  int watchdog_us;
+  callbk_t alertFunc;
+  void *userdata;
+  uint32_t offset;
+  uint32_t *offsets_p;
+  uint64_t *values_p; /* redundant to store values with gpiochip API2  */
+                      /* kept in case it is needed again in the future */
 } lgLineInf_t, *lgLineInf_p;
 
-typedef struct lgChipObj_s
-{
-   int gpiochip;
-   int handle; /* needed for auto resource free */
-   uint32_t lines;
-   int fd;
-   lgLineInf_p LineInf;
-   char name[LG_GPIO_NAME_LEN];
-   char label[LG_GPIO_LABEL_LEN];
-   char userLabel[LG_GPIO_USER_LEN];
+typedef struct lgChipObj_s {
+  int gpiochip;
+  int handle; /* needed for auto resource free */
+  uint32_t lines;
+  int fd;
+  lgLineInf_p LineInf;
+  char name[LG_GPIO_NAME_LEN];
+  char label[LG_GPIO_LABEL_LEN];
+  char userLabel[LG_GPIO_USER_LEN];
 } lgChipObj_t, *lgChipObj_p;
 
 void xWrite(lgChipObj_p chip, int gpio, int value);
-void xGroupWrite(
-   lgChipObj_p chip, int gpio, uint64_t groupBits, uint64_t groupMask);
+void xGroupWrite(lgChipObj_p chip, int gpio, uint64_t groupBits,
+                 uint64_t groupMask);
 
 extern callbk_t lgGpioSamplesFunc;
 extern void *lgGpioSamplesUserdata;
 
 #endif
-

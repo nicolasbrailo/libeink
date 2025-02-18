@@ -30,37 +30,35 @@ For more information, please refer to <http://unlicense.org/>
 
 #include <pthread.h>
 
-#include "lgpio.h"
 #include "lgGpio.h"
+#include "lgpio.h"
 
-typedef struct lgAlertRec_s
-{
-   uint64_t last_rpt_ts;
-   uint64_t last_evt_ts;
-   int64_t debounce_nanos;
-   int64_t watchdog_nanos;
-   int last_evt_lv;
-   int last_rpt_lv;
-   int debounced;
-   int watchdogd;
-   int eFlags;
-   int gpio;
-   int nfyHandle;
-   lgLineInf_p state;
-   int active;
-   lgChipObj_p chip;
-   struct lgAlertRec_s *prev;
-   struct lgAlertRec_s *next;
+typedef struct lgAlertRec_s {
+  uint64_t last_rpt_ts;
+  uint64_t last_evt_ts;
+  int64_t debounce_nanos;
+  int64_t watchdog_nanos;
+  int last_evt_lv;
+  int last_rpt_lv;
+  int debounced;
+  int watchdogd;
+  int eFlags;
+  int gpio;
+  int nfyHandle;
+  lgLineInf_p state;
+  int active;
+  lgChipObj_p chip;
+  struct lgAlertRec_s *prev;
+  struct lgAlertRec_s *next;
 } lgAlertRec_t, *lgAlertRec_p;
 
 lgAlertRec_p lgGpioGetAlertRec(lgChipObj_p chip, int gpio);
 
-lgAlertRec_p lgGpioCreateAlertRec(
-   lgChipObj_p chip, int gpio, lgLineInf_p state, int nfyHandle);
+lgAlertRec_p lgGpioCreateAlertRec(lgChipObj_p chip, int gpio, lgLineInf_p state,
+                                  int nfyHandle);
 
 void *lgPthAlert(void);
 void lgPthAlertStart(void);
 void lgPthAlertStop(lgChipObj_p chip);
 
 #endif
-

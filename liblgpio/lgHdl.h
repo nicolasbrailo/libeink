@@ -32,17 +32,16 @@ For more information, please refer to <http://unlicense.org/>
 
 #include "lgpio.h"
 
-#define LG_HDL_TYPE_NONE   0
-#define LG_HDL_TYPE_GPIO   1
-#define LG_HDL_TYPE_I2C    2
-#define LG_HDL_TYPE_FILE   3
+#define LG_HDL_TYPE_NONE 0
+#define LG_HDL_TYPE_GPIO 1
+#define LG_HDL_TYPE_I2C 2
+#define LG_HDL_TYPE_FILE 3
 #define LG_HDL_TYPE_SERIAL 4
 #define LG_HDL_TYPE_NOTIFY 5
 #define LG_HDL_TYPE_SCRIPT 6
-#define LG_HDL_TYPE_SPI    7
+#define LG_HDL_TYPE_SPI 7
 
-int lgHdlAlloc
-   (int type, int objSize, void **objPtr, callbk_t destructor);
+int lgHdlAlloc(int type, int objSize, void **objPtr, callbk_t destructor);
 
 int lgHdlFree(int handle, int type);
 
@@ -63,4 +62,3 @@ int lgHdlLock(int handle);
 int lgHdlUnlock(int handle);
 
 #endif
-

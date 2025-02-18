@@ -30,32 +30,29 @@ For more information, please refer to <http://unlicense.org/>
 
 #include <pthread.h>
 
-typedef struct lgPermit_s
-{
-   char *files;
-   char *scripts;
-   char *i2c;
-   char *spi;
-   char *serial;
-   char *gpio;
-   char *notify;
-   char *debug;
-   char *shell;
+typedef struct lgPermit_s {
+  char *files;
+  char *scripts;
+  char *i2c;
+  char *spi;
+  char *serial;
+  char *gpio;
+  char *notify;
+  char *debug;
+  char *shell;
 } lgPermit_t, *lgPermit_p;
 
-typedef struct lgCtx_s
-{
-   char user[LG_USER_LEN];
-   char salt1[LG_SALT_LEN];
-   char salt2[LG_SALT_LEN];
-   int owner;
-   int approved;
-   int autoSetShare;
-   int autoUseShare;
-   lgPermit_t permits;
+typedef struct lgCtx_s {
+  char user[LG_USER_LEN];
+  char salt1[LG_SALT_LEN];
+  char salt2[LG_SALT_LEN];
+  int owner;
+  int approved;
+  int autoSetShare;
+  int autoUseShare;
+  lgPermit_t permits;
 } lgCtx_t, *lgCtx_p;
 
 lgCtx_p lgCtxGet(void);
 
 #endif
-
