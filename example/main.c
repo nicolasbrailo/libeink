@@ -10,8 +10,8 @@
 #include <time.h>
 
 
-#define DEFAULT_DISPLAY_WIDTH 122
-#define DEFAULT_DISPLAY_HEIGHT 250
+#define DEFAULT_DISPLAY_WIDTH 250
+#define DEFAULT_DISPLAY_HEIGHT 122
 
 struct Display {
   size_t width_px;
@@ -40,11 +40,16 @@ void eink_delete() {
 
 void eink_pattern(struct Display* display, uint8_t c) {
   EPD_2in13_V4_SendCommand(0x24);
+  size_t xx =0;
+  Debug("RENDER IMG %db x %d = %d x %d\n", display->width_bytes, display->height_px, 8*display->width_bytes, display->height_px);
   for (size_t i = 0; i < display->height_px; ++i) {
     for (size_t j = 0; j < display->width_bytes; ++j) {
       EPD_2in13_V4_SendData(c);
+      xx++;
     }
   }
+
+  Debug("XXX SENT %zd\n", xx);
 
   EPD_2in13_V4_TurnOnDisplay();
 }
@@ -109,19 +114,13 @@ void render(cairo_surface_t *surface) {
   const int height = cairo_image_surface_get_height(surface);
   const int stride = cairo_image_surface_get_stride(surface);
   const uint8_t *data = cairo_image_surface_get_data(surface);
-  uint8_t display_pixel = 0;
   EPD_2in13_V4_SendCommand(0x24);
-  for (int y = height - 1; y >= 0; y--) {
-      for (int x = 0; x < width; x++) {
-          int pixel_in_image_index = (x / 8) + y * stride;
-          int bit_index = x % 8;
-          display_pixel |= (data[pixel_in_image_index] << bit_index);
-          if (bit_index == 7) {
-            EPD_2in13_V4_SendData(display_pixel);
-            display_pixel = 0;
-          }
-      }
+  size_t xx = 0;
+  for (int i=0; i < width + height * stride; ++i) {
+    EPD_2in13_V4_SendData(data[i]);
+    xx++;
   }
+  Debug("CCC SENT %zd\n", xx);
   EPD_2in13_V4_TurnOnDisplay();
 }
 
