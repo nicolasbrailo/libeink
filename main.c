@@ -3,6 +3,8 @@
 #include <time.h>
 #include <stdio.h>
 
+#include <unistd.h>
+
 int main(int argc, char **argv) {
   struct EInkDisplay* display = eink_init();
   cairo_t *cr = eink_get_cairo(display);
@@ -34,6 +36,38 @@ int main(int argc, char **argv) {
   cairo_stroke(cr);
 
   eink_render(display);
+
+  printf("RENDERED FRAME 1\n");
+  printf("Continue in 3...\n");
+  sleep(1);
+  printf("Continue in 2...\n");
+  sleep(1);
+  printf("Continue in 1...\n");
+  sleep(1);
+
+  cairo_rectangle(cr, x + extents.x_bearing - 10, y + extents.y_bearing - 10,
+                  extents.width + 20, extents.height + 20);
+  cairo_fill(cr);
+  cairo_stroke(cr);
+  eink_render_partial(display);
+
+  printf("BLANKED\n");
+  printf("Continue in 3...\n");
+  sleep(1);
+  printf("Continue in 2...\n");
+  sleep(1);
+  printf("Continue in 1...\n");
+  sleep(1);
+
+  cairo_set_source_rgba(cr, 0, 0, 0, 0);
+  cairo_rectangle(cr, x + extents.x_bearing - 10, y + extents.y_bearing - 10,
+                  extents.width + 20, extents.height + 20);
+  cairo_fill(cr);
+  cairo_set_source_rgba(cr, 0, 0, 0, 1);
+  cairo_move_to(cr, x, y);
+  cairo_show_text(cr, "HOLA!");
+  cairo_stroke(cr);
+  eink_render_partial(display);
 
   // eink_clear(display);
 

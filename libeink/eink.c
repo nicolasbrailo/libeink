@@ -256,7 +256,9 @@ void eink_delete(struct EInkDisplay *display) {
     cairo_surface_destroy(display->surface);
   }
 
-  dev_shutdown(display);
+  if ((display->gpio_handle >= 0) && (display->spi_handle >= 0)) {
+      dev_shutdown(display);
+  }
 
   if (display->gpio_handle >= 0) {
     // This is commented out in the manufacturer example, not sure why
@@ -266,6 +268,7 @@ void eink_delete(struct EInkDisplay *display) {
     // lgGpioWrite(display->gpio_handle, EPD_RST_PIN, 0);
     lgGpiochipClose(display->gpio_handle);
   }
+
   if (display->spi_handle >= 0) {
     lgSpiClose(display->spi_handle);
   }
@@ -275,7 +278,7 @@ void eink_delete(struct EInkDisplay *display) {
 
 cairo_t *eink_get_cairo(struct EInkDisplay *display) { return display->cr; }
 
-void eink_render(struct EInkDisplay *display) {
+static void eink_render_impl(struct EInkDisplay *display, bool is_partial) {
   cairo_surface_t *surface = display->surface;
   const size_t width = cairo_image_surface_get_width(surface);
   const size_t height = cairo_image_surface_get_height(surface);
@@ -307,11 +310,17 @@ void eink_render(struct EInkDisplay *display) {
     }
   }
 
-  dev_render(display, display_canvas, false);
   // TODO: Partial can be used but requires blanking out the pixels to be
-  // re-renered first
-  //       should send a white rectangle to cover the area first
-  // dev_render(display, display_canvas, true);
+  // re-renered first should send a white rectangle to cover the area first
+  dev_render(display, display_canvas, is_partial);
+}
+
+void eink_render(struct EInkDisplay *display) {
+    eink_render_impl(display, false);
+}
+
+void eink_render_partial(struct EInkDisplay *display) {
+    eink_render_impl(display, true);
 }
 
 void eink_clear(struct EInkDisplay *display) {

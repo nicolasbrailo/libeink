@@ -23,4 +23,6 @@ void eink_delete(struct EInkDisplay *display);
 
 cairo_t *eink_get_cairo(struct EInkDisplay *display);
 void eink_render(struct EInkDisplay *display);
+void eink_render_partial(struct EInkDisplay *display);
 void eink_clear(struct EInkDisplay *display);
+
