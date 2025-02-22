@@ -18,6 +18,10 @@
 int GPIO_Handle;
 int SPI_Handle;
 
+void DEV_Digital_Write(size_t Pin, uint8_t Value) {
+  lgGpioWrite(GPIO_Handle, Pin, Value);
+}
+
 void DEV_GPIO_Mode(size_t Pin, size_t Mode) {
   if (Mode == 0 || Mode == LG_SET_INPUT) {
     lgGpioClaimInput(GPIO_Handle, 0, Pin);
@@ -26,9 +30,6 @@ void DEV_GPIO_Mode(size_t Pin, size_t Mode) {
   }
 }
 
-void DEV_Digital_Write(size_t Pin, uint8_t Value) {
-  lgGpioWrite(GPIO_Handle, Pin, Value);
-}
 uint8_t DEV_Module_Init(void) {
   printf("DEV_Module_Init\n");
   GPIO_Handle = lgGpiochipOpen(0);
@@ -69,6 +70,7 @@ void DEV_Module_Exit(void) {
   lgSpiClose(SPI_Handle);
   lgGpiochipClose(GPIO_Handle);
 }
+
 
 uint8_t DEV_Digital_Read(size_t Pin) {
   uint8_t Read_value = 0;
@@ -357,3 +359,14 @@ void eink_render(struct EInkDisplay* display) {
   //foo_EPD_2in13_V4_Display_Partial(display_canvas);
 }
 
+void eink_clear(struct EInkDisplay *display) {
+  EPD_2in13_V4_SendCommand(0x24);
+  // Screen memory is rotated 90 degs
+  const size_t height_bytes = (display->height % 8)==0? display->height/8 : display->height/8+1;
+  for (size_t i = 0; i < display->width; ++i) {
+    for (size_t j = 0; j < height_bytes; ++j) {
+      EPD_2in13_V4_SendData(display->invert_color? 0x00 : 0xFF);
+    }
+  }
+  EPD_2in13_V4_TurnOnDisplay();
+}

@@ -1,6 +1,7 @@
 #include "libeink/eink.h"
 #include <cairo/cairo.h>
 #include <time.h>
+#include <stdio.h>
 
 int main(int argc, char **argv) {
   struct EInkDisplay* display = eink_init();
@@ -17,7 +18,7 @@ int main(int argc, char **argv) {
 
   // Calculate text position
   cairo_text_extents_t extents;
-  const char *text = "Hello " __TIME__;
+  const char *text = "Hola " __TIME__;
   cairo_text_extents(cr, text, &extents);
   double x = (width - extents.width) / 2 - extents.x_bearing;
   double y = (height - extents.height) / 2 - extents.y_bearing;
@@ -34,7 +35,10 @@ int main(int argc, char **argv) {
 
   eink_render(display);
 
+  // eink_clear(display);
+
   eink_delete(display);
 
   return 0;
 }
+
