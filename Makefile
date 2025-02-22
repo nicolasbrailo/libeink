@@ -53,19 +53,10 @@ eink: \
 		build/liblgpio/lgSPI.o \
 		build/liblgpio/lgThread.o \
 		build/liblgpio/lgUtil.o \
-		build/fonts/font12.o \
-		build/fonts/font16.o \
-		build/fonts/font20.o \
-		build/fonts/font24.o \
-		build/fonts/font8.o \
-		build/libeink/GUI_BMPfile.o \
-		build/libeink/GUI_Paint.o \
 		build/libeink/EPD_2in13_V4.o \
 		build/libeink/dev_hardware_SPI.o \
 		build/libeink/DEV_Config.o \
-		build/example/main2.o \
-		build/example/ImageData2.o \
-		build/example/ImageData.o
+		build/example/main2.o
 	clang $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 
