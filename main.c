@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
 
   // Calculate text position
   cairo_text_extents_t extents;
-  const char *text = "Hola " __TIME__;
+  const char *text = "Hi" __TIME__;
   cairo_text_extents(cr, text, &extents);
   double x = (width - extents.width) / 2 - extents.x_bearing;
   double y = (height - extents.height) / 2 - extents.y_bearing;
