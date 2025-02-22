@@ -5,6 +5,8 @@ XCOMPILE=\
 	 -mcpu=arm1176jzf-s \
 	 --sysroot $(SYSROOT)
 
+#XCOMPILE=
+
 LIBEINK_DEFS=-D epd2in13V4 -D USE_LGPIO_LIB -D RPI -D DEBUG
 INCLUDE_DIRS=-I .
 # TODO missing flags:
@@ -61,7 +63,7 @@ eink: \
 		build/libeink/EPD_2in13_V4.o \
 		build/libeink/dev_hardware_SPI.o \
 		build/libeink/DEV_Config.o \
-		build/example/main.o \
+		build/example/main2.o \
 		build/example/ImageData2.o \
 		build/example/ImageData.o
 	clang $(CFLAGS) $(LDFLAGS) $^ -o $@
@@ -73,6 +75,9 @@ clean:
 build/%.o: %.c
 	mkdir -p $(shell dirname $@)
 	clang $(CFLAGS) -c $^ -o $@
+
+cairo: cairo.c
+	clang -o cairo cairo.c -lcairo && ./cairo && file ./output.bmp
 
 .PHONY: xcompile-start xcompile-end xcompile-rebuild-sysrootdeps
 
@@ -88,5 +93,5 @@ install_sysroot_deps:
 
 run: eink
 	scp eink StoneBakedMargheritaHomeboard:/home/batman/eink
-	#ssh StoneBakedMargheritaHomeboard /home/batman/eink/eink
+	ssh StoneBakedMargheritaHomeboard /home/batman/eink/eink pat
 
