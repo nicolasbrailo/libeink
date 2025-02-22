@@ -42,21 +42,13 @@ LDFLAGS=-Wl,--gc-sections -lm -lcairo
 eink: \
 		build/liblgpio/lgCtx.o \
 		build/liblgpio/lgDbg.o \
-		build/liblgpio/lgErr.o \
 		build/liblgpio/lgGpio.o \
 		build/liblgpio/lgHdl.o \
-		build/liblgpio/lgI2C.o \
-		build/liblgpio/lgNotify.o \
 		build/liblgpio/lgPthAlerts.o \
 		build/liblgpio/lgPthTx.o \
-		build/liblgpio/lgSerial.o \
 		build/liblgpio/lgSPI.o \
-		build/liblgpio/lgThread.o \
-		build/liblgpio/lgUtil.o \
-		build/libeink/EPD_2in13_V4.o \
-		build/libeink/dev_hardware_SPI.o \
-		build/libeink/DEV_Config.o \
-		build/example/main2.o
+		build/libeink/eink.o \
+		build/main.o
 	clang $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 
