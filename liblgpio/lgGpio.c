@@ -77,7 +77,7 @@ static inline void xAssignBit(uint64_t *b, int n, int value) {
 }
 
 static void _lgGpiochipClose(void *objPtr) {
-  int i;
+  size_t i;
   lgChipObj_p chip;
 
   chip = objPtr;
@@ -139,7 +139,8 @@ static void _lgGpiochipClose(void *objPtr) {
 
 static int xGpioHandleRequest(lgChipObj_p chip,
                               struct gpio_v2_line_request *req) {
-  int i, gpio, mode;
+  size_t i;
+  int gpio, mode;
   int status;
   uint32_t *offsets_p;
   uint64_t *values_p;

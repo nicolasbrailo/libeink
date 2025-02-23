@@ -18,6 +18,8 @@ struct EInkDisplay {
 
   cairo_surface_t *surface;
   cairo_t *cr;
+  int cairo_fg_color;
+  int cairo_bg_color;
 };
 
 #define EPD_2in13_V4_WIDTH 122
@@ -72,8 +74,9 @@ static void dev_tx(struct EInkDisplay *display, enum Cmd_Or_Data is_cmd,
 }
 
 static void dev_wakeup(struct EInkDisplay *display, bool partial) {
-  int d = partial ? 0xff : 0xf7; // fast:0x0c, quality:0x0f, 0xcf
-  dev_tx(display, TX_CMD, 0x22); // Display Update Control
+  // const int d = partial ? 0xff : 0xf7; // fast:0x0c, quality:0x0f, 0xcf
+  const int d = partial ? 0xfe : 0xf7; // fast:0x0c, quality:0x0f, 0xcf
+  dev_tx(display, TX_CMD, 0x22);       // Display Update Control
   dev_tx(display, TX_DATA, d);
   dev_tx(display, TX_CMD, 0x20); // Activate Display Update Sequence
   dev_sleep_until_ready(display);
@@ -153,6 +156,10 @@ void dev_render(struct EInkDisplay *display, uint8_t *Image,
     dev_tx(display, TX_CMD, 0x3C); // BorderWavefrom
     dev_tx(display, TX_DATA, 0x80);
     dev_quick_reset(display);
+  } else {
+    // This seems to control how each pixel is updated in the display
+    dev_tx(display, TX_CMD, 0x3C); // BorderWavefrom
+    dev_tx(display, TX_DATA, 0x05);
   }
 
   // Write Black and White image to RAM
@@ -166,6 +173,7 @@ void dev_render(struct EInkDisplay *display, uint8_t *Image,
       dev_tx(display, TX_DATA, Image[i + j * byte_height]);
     }
   }
+
   dev_wakeup(display, is_partial_update);
 }
 
@@ -185,6 +193,8 @@ struct EInkDisplay *eink_init() {
 
   // Select black-on-white or reverse
   display->invert_color = false;
+  display->cairo_fg_color = 1;
+  display->cairo_bg_color = 0;
 
   display->gpio_handle = lgGpiochipOpen(0);
   if (display->gpio_handle < 0) {
@@ -231,7 +241,7 @@ struct EInkDisplay *eink_init() {
   cairo_set_operator(display->cr, CAIRO_OPERATOR_SOURCE);
 
   // Set background color to white (transparent in A1 format)
-  cairo_set_source_rgba(display->cr, 1, 1, 1, 0);
+  cairo_set_source_rgba(display->cr, 1, 1, 1, display->cairo_bg_color);
   cairo_paint(display->cr);
 
   dev_init(display);
@@ -257,7 +267,7 @@ void eink_delete(struct EInkDisplay *display) {
   }
 
   if ((display->gpio_handle >= 0) && (display->spi_handle >= 0)) {
-      dev_shutdown(display);
+    dev_shutdown(display);
   }
 
   if (display->gpio_handle >= 0) {
@@ -310,29 +320,77 @@ static void eink_render_impl(struct EInkDisplay *display, bool is_partial) {
     }
   }
 
-  // TODO: Partial can be used but requires blanking out the pixels to be
-  // re-renered first should send a white rectangle to cover the area first
   dev_render(display, display_canvas, is_partial);
 }
 
 void eink_render(struct EInkDisplay *display) {
-    eink_render_impl(display, false);
+  eink_render_impl(display, false);
 }
 
 void eink_render_partial(struct EInkDisplay *display) {
-    eink_render_impl(display, true);
+  eink_render_impl(display, true);
+}
+
+static int cairo_get_last_set_color(struct EInkDisplay *display) {
+  cairo_pattern_t *pattern = cairo_get_source(display->cr);
+  double r, g, b, a;
+  if (cairo_pattern_get_rgba(pattern, &r, &g, &b, &a) != CAIRO_STATUS_SUCCESS) {
+    return display->cairo_fg_color;
+  }
+  return a < 0.1 ? 0 : 1;
+}
+
+void eink_invalidate_rect(struct EInkDisplay *display, size_t x_start,
+                          size_t y_start, size_t x_end, size_t y_end) {
+  const int user_set_color = cairo_get_last_set_color(display);
+
+  // Resetting to fg color and then to bg color may have better results?
+  const int invalidate_color = display->cairo_bg_color;
+
+  // "Cover" invalidated area with a box
+  cairo_set_source_rgba(display->cr, 0, 0, 0, invalidate_color);
+  cairo_rectangle(display->cr, x_start, y_start, x_end, y_end);
+  cairo_fill(display->cr);
+  cairo_stroke(display->cr);
+
+  // Quick-draw to screen: this will force all pixels to cycle, and the real
+  // call to render_partial by the user will set the right pixels without
+  // glitches
+  eink_render_partial(display);
+
+  if (invalidate_color == display->cairo_fg_color) {
+    // Reset invalidated area to blank
+    cairo_set_source_rgba(display->cr, 0, 0, 0, display->cairo_bg_color);
+    cairo_rectangle(display->cr, x_start, y_start, x_end, y_end);
+    cairo_fill(display->cr);
+  }
+
+  // Restore "pen"
+  cairo_set_source_rgba(display->cr, 0, 0, 0, user_set_color);
 }
 
 void eink_clear(struct EInkDisplay *display) {
+  const int user_set_color = cairo_get_last_set_color(display);
+  // Clear canvas
+  cairo_set_source_rgba(display->cr, 0, 0, 0, display->cairo_bg_color);
+  cairo_paint(display->cr);
+  // Restore "pen"
+  cairo_set_source_rgba(display->cr, 0, 0, 0, user_set_color);
+
   dev_tx(display, TX_CMD, 0x24);
-  // Screen memory is rotated 90 degs
-  const size_t height_bytes = (display->height % 8) == 0
-                                  ? display->height / 8
-                                  : display->height / 8 + 1;
-  for (size_t i = 0; i < display->width; ++i) {
-    for (size_t j = 0; j < height_bytes; ++j) {
-      dev_tx(display, TX_DATA, display->invert_color ? 0x00 : 0xFF);
+  for (size_t c = 0; c < 2; ++c) {
+    // Screen memory is rotated 90 degs
+    const size_t height_bytes = (display->height % 8) == 0
+                                    ? display->height / 8
+                                    : display->height / 8 + 1;
+    for (size_t i = 0; i < display->width; ++i) {
+      for (size_t j = 0; j < height_bytes; ++j) {
+        dev_tx(display, TX_DATA, display->invert_color ? 0x00 : 0xFF);
+      }
     }
+
+    dev_tx(display, TX_CMD, 0x26);
   }
+
   dev_wakeup(display, false);
 }
