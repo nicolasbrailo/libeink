@@ -1,42 +1,39 @@
-
 SYSROOT=/home/batman/src/xcomp-rpiz-env/mnt/
 XCOMPILE=\
 	 -target arm-linux-gnueabihf \
 	 -mcpu=arm1176jzf-s \
 	 --sysroot $(SYSROOT)
 
+# Uncomment to build to local target:
 #XCOMPILE=
 
-LIBEINK_DEFS=-D epd2in13V4 -D USE_LGPIO_LIB -D RPI -D DEBUG
-INCLUDE_DIRS=-I .
-# TODO missing flags:
+# TODO liblgpio breaks with these
 #	-Wpedantic  \
-#	-Wstrict-aliasing=2 \
-#	-Wextra
-#	-Wfloat-equal \
-#	-Wredundant-decls \
-	-Wmissing-include-dirs \
-	-Wpointer-arith \
-	-Winit-self \
-	-Wimplicit-fallthrough \
-	-Wendif-labels \
-	-Woverflow \
-	-Wformat=2 \
-	-Winvalid-pch \
-	-ggdb -O0 \
-	-std=c99 \
-	-fdiagnostics-color=always \
-	-D_FILE_OFFSET_BITS=64 \
-	-D_POSIX_C_SOURCE=200809 \
-	-Wundef \
-
+# -Wextra
 
 CFLAGS= \
 	$(XCOMPILE) \
+	-fdiagnostics-color=always \
+	-ffunction-sections -fdata-sections \
+	-ggdb -O3 \
+	-std=gnu99 \
 	-Wall -Werror \
+	-Wendif-labels \
+	-Wfloat-equal \
+	-Wformat=2 \
+	-Wimplicit-fallthrough \
+	-Winit-self \
+	-Winvalid-pch \
+	-Wmissing-include-dirs \
 	-Wno-strict-prototypes \
 	-Wno-unused-function \
-	-ggdb -O3 -ffunction-sections -fdata-sections -pthread $(LIBEINK_DEFS) $(INCLUDE_DIRS)
+	-Woverflow \
+	-Wpointer-arith \
+	-Wredundant-decls \
+	-Wstrict-aliasing=2 \
+	-Wundef \
+	-I.
+
 LDFLAGS=-Wl,--gc-sections -lm -lcairo
 
 eink: \
@@ -71,10 +68,11 @@ xcompile-end:
 	./rpiz-xcompile/umount_rpy_root.sh ~/src/xcomp-rpiz-env
 
 install_sysroot_deps:
-	# TODO cairo
-	true
+	./rpiz-xcompile/add_sysroot_pkg.sh ~/src/xcomp-rpiz-env http://archive.raspberrypi.com/debian/pool/main/c/cairo/libcairo2-dev_1.16.0-7+rpt1_armhf.deb
 
-run: eink
+.PHONY: deploy run
+deploy: eink
 	scp eink StoneBakedMargheritaHomeboard:/home/batman/eink
-	ssh StoneBakedMargheritaHomeboard /home/batman/eink/eink pat
+run: deploy
+	ssh StoneBakedMargheritaHomeboard /home/batman/eink/eink
 
