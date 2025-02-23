@@ -32,6 +32,7 @@ void show_clock(struct EInkDisplay* display) {
   cairo_set_source_rgba(cr, 0, 0, 0, 0);
   cairo_paint(cr);
   cairo_set_font_size(cr, 20);
+  cairo_set_source_rgba(cr, 0, 0, 0, 1);
 
   while (!gUserStop) {
     time_t now = time(NULL);
@@ -40,7 +41,7 @@ void show_clock(struct EInkDisplay* display) {
     static char time_str[sizeof(TXT_FMT)];
     snprintf(time_str, sizeof(time_str), TXT_FMT, t->tm_hour, t->tm_min, t->tm_sec);
 
-#if 1
+#if 0
     cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
     cairo_move_to(cr, clock_x, clock_y);
     cairo_show_text(cr, time_str);

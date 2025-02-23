@@ -74,8 +74,7 @@ static void dev_tx(struct EInkDisplay *display, enum Cmd_Or_Data is_cmd,
 }
 
 static void dev_wakeup(struct EInkDisplay *display, bool partial) {
-  // const int d = partial ? 0xff : 0xf7; // fast:0x0c, quality:0x0f, 0xcf
-  const int d = partial ? 0xfe : 0xf7; // fast:0x0c, quality:0x0f, 0xcf
+  const int d = partial ? 0xff : 0xf7; // fast:0x0c, quality:0x0f, 0xcf
   dev_tx(display, TX_CMD, 0x22);       // Display Update Control
   dev_tx(display, TX_DATA, d);
   dev_tx(display, TX_CMD, 0x20); // Activate Display Update Sequence
@@ -171,6 +170,18 @@ void dev_render(struct EInkDisplay *display, uint8_t *Image,
   for (size_t j = 0; j < display->width; j++) {
     for (size_t i = 0; i < byte_height; i++) {
       dev_tx(display, TX_DATA, Image[i + j * byte_height]);
+    }
+  }
+
+  if (is_partial_update) {
+    dev_tx(display, TX_CMD, 0x26);
+    const size_t byte_height = (display->height % 8 == 0)
+                                   ? (display->height / 8)
+                                   : (display->height / 8 + 1);
+    for (size_t j = 0; j < display->width; j++) {
+      for (size_t i = 0; i < byte_height; i++) {
+        dev_tx(display, TX_DATA, Image[i + j * byte_height]);
+      }
     }
   }
 
