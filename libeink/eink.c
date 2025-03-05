@@ -311,8 +311,8 @@ static void eink_render_impl(struct EInkDisplay *display, bool is_partial) {
   uint8_t *display_canvas = malloc(display_canvas_sz);
   memset(display_canvas, 0, display_canvas_sz);
 
-  for (int y = 0; y < height; y++) {
-    for (int x = 0; x < width; x++) {
+  for (size_t y = 0; y < height; y++) {
+    for (size_t x = 0; x < width; x++) {
       const size_t src_byte_index = x / 8 + y * stride;
       const size_t src_bit_index = x % 8;
 

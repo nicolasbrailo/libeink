@@ -96,7 +96,7 @@ static void _lgGpiochipClose(void *objPtr) {
   for (i = 0; i < chip->lines; i++) {
     if (chip->LineInf[i].mode != LG_CHIP_MODE_UNKNOWN) {
       /* free GPIO */
-      LG_DBG(LG_DEBUG_ALLOC, "free GPIO: %d mode %d (%d of %d)", i,
+      LG_DBG(LG_DEBUG_ALLOC, "free GPIO: %zu mode %d (%d of %d)", i,
              chip->LineInf[i].mode, chip->LineInf[i].offset + 1,
              chip->LineInf[i].group_size);
 
