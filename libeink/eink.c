@@ -9,6 +9,8 @@
 #include <string.h>
 
 struct EInkDisplay {
+  struct EInkConfig cfg;
+
   int gpio_handle;
   int spi_handle;
 
@@ -188,11 +190,18 @@ void dev_render(struct EInkDisplay *display, uint8_t *Image,
   dev_wakeup(display, is_partial_update);
 }
 
-struct EInkDisplay *eink_init() {
+struct EInkDisplay *eink_init(struct EInkConfig* cfg) {
   struct EInkDisplay *display = malloc(sizeof(struct EInkDisplay));
   if (!display) {
     fprintf(stderr, "bad_alloc: display\n");
     return NULL;
+  }
+
+  display->cfg.mock_display = cfg->mock_display;
+  display->cfg.save_render_to_png_file = strdup(cfg->save_render_to_png_file);
+  if (cfg->save_render_to_png_file && !display->cfg.save_render_to_png_file) {
+    fprintf(stderr, "bad_alloc: save_render_to_png_file\n");
+    goto err;
   }
 
   display->gpio_handle = -1;
@@ -207,37 +216,10 @@ struct EInkDisplay *eink_init() {
   display->cairo_fg_color = 1;
   display->cairo_bg_color = 0;
 
-  display->gpio_handle = lgGpiochipOpen(0);
-  if (display->gpio_handle < 0) {
-    display->gpio_handle = lgGpiochipOpen(4);
-    if (display->gpio_handle < 0) {
-      fprintf(stderr, "Can't find /dev/gpiochip[1|4]\n");
-      goto err;
-    }
-  }
-
-  display->spi_handle = lgSpiOpen(0, 0, 10000000, 0);
-  if (display->spi_handle == LG_SPI_IOCTL_FAILED) {
-    fprintf(stderr, "Can't open SPI\n");
-    goto err;
-  }
-
-  lgGpioClaimInput(display->gpio_handle, 0, EPD_BUSY_PIN);
-  lgGpioClaimOutput(display->gpio_handle, 0, EPD_RST_PIN, LG_LOW);
-  lgGpioClaimOutput(display->gpio_handle, 0, EPD_DC_PIN, LG_LOW);
-  lgGpioClaimOutput(display->gpio_handle, 0, EPD_CS_PIN, LG_LOW);
-  lgGpioClaimOutput(display->gpio_handle, 0, EPD_PWR_PIN, LG_LOW);
-
-  // This is commented out in the manufacturer example, not sure why
-  // lgGpioClaimInput(display->gpio_handle, 0, EPD_MOSI_PIN);
-  // lgGpioClaimOutput(display->gpio_handle, 0, EPD_SCLK_PIN, LG_LOW);
-
-  lgGpioWrite(display->gpio_handle, EPD_CS_PIN, 1);
-  lgGpioWrite(display->gpio_handle, EPD_PWR_PIN, 1);
-
   // Create a monochrome (1-bit) surface
   display->surface = cairo_image_surface_create(CAIRO_FORMAT_A1, display->width,
                                                 display->height);
+
   if (!display->surface) {
     fprintf(stderr, "bad_alloc: display->surface\n");
     goto err;
@@ -255,7 +237,37 @@ struct EInkDisplay *eink_init() {
   cairo_set_source_rgba(display->cr, 1, 1, 1, display->cairo_bg_color);
   cairo_paint(display->cr);
 
-  dev_init(display);
+  if (!display->cfg.mock_display) {
+    display->gpio_handle = lgGpiochipOpen(0);
+    if (display->gpio_handle < 0) {
+      display->gpio_handle = lgGpiochipOpen(4);
+      if (display->gpio_handle < 0) {
+        fprintf(stderr, "Can't find /dev/gpiochip[1|4]\n");
+        goto err;
+      }
+    }
+
+    display->spi_handle = lgSpiOpen(0, 0, 10000000, 0);
+    if (display->spi_handle == LG_SPI_IOCTL_FAILED) {
+      fprintf(stderr, "Can't open SPI\n");
+      goto err;
+    }
+
+    lgGpioClaimInput(display->gpio_handle, 0, EPD_BUSY_PIN);
+    lgGpioClaimOutput(display->gpio_handle, 0, EPD_RST_PIN, LG_LOW);
+    lgGpioClaimOutput(display->gpio_handle, 0, EPD_DC_PIN, LG_LOW);
+    lgGpioClaimOutput(display->gpio_handle, 0, EPD_CS_PIN, LG_LOW);
+    lgGpioClaimOutput(display->gpio_handle, 0, EPD_PWR_PIN, LG_LOW);
+
+    // This is commented out in the manufacturer example, not sure why
+    // lgGpioClaimInput(display->gpio_handle, 0, EPD_MOSI_PIN);
+    // lgGpioClaimOutput(display->gpio_handle, 0, EPD_SCLK_PIN, LG_LOW);
+
+    lgGpioWrite(display->gpio_handle, EPD_CS_PIN, 1);
+    lgGpioWrite(display->gpio_handle, EPD_PWR_PIN, 1);
+
+    dev_init(display);
+  }
 
   return display;
 
@@ -294,6 +306,7 @@ void eink_delete(struct EInkDisplay *display) {
     lgSpiClose(display->spi_handle);
   }
 
+  free((void*)display->cfg.save_render_to_png_file);
   free(display);
 }
 
@@ -331,7 +344,15 @@ static void eink_render_impl(struct EInkDisplay *display, bool is_partial) {
     }
   }
 
-  dev_render(display, display_canvas, is_partial);
+  if (!display->cfg.mock_display) {
+    printf("EInk: skip render, mocking display\n");
+  } else {
+    dev_render(display, display_canvas, is_partial);
+  }
+
+  if (display->cfg.save_render_to_png_file) {
+    cairo_surface_write_to_png(surface, display->cfg.save_render_to_png_file);
+  }
 }
 
 void eink_render(struct EInkDisplay *display) {

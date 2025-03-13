@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stddef.h>
+#include <stdbool.h>
 
 // Controller for https://www.waveshare.com/wiki/2.13inch_e-Paper_HAT_Manual
 //
@@ -20,8 +21,13 @@
 struct EInkDisplay;
 typedef struct _cairo cairo_t;
 
+struct EInkConfig {
+  bool mock_display;
+  const char* save_render_to_png_file;
+};
+
 // Init device and wait until it's ready to operate
-struct EInkDisplay *eink_init();
+struct EInkDisplay *eink_init(struct EInkConfig* cfg);
 
 // Disconnects from device after setting it to sleep/low power mode
 // Takes a few seconds to complete
