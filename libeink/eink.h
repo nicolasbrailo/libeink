@@ -51,3 +51,6 @@ void eink_render_partial(struct EInkDisplay *display);
 // on the next call to eink_render_partial
 void eink_invalidate_rect(struct EInkDisplay *display, size_t x_start,
                           size_t y_start, size_t x_end, size_t y_end);
+
+void eink_quick_announce(struct EInkDisplay *display, const char* text, size_t font_sz);
+

@@ -1,4 +1,5 @@
 #include "eink.h"
+#include "cairo_helpers.h"
 
 #include "liblgpio/lgpio.h"
 #include <cairo/cairo.h>
@@ -147,6 +148,7 @@ void dev_init(struct EInkDisplay *display) {
 void dev_shutdown(struct EInkDisplay *display) {
   dev_tx(display, TX_CMD, 0x10); // enter deep sleep
   dev_tx(display, TX_DATA, 0x01);
+  printf("Shutdown eInk, sleep 2s to sync\n");
   sleep_ms(2000); // important, at least 2s
 }
 
@@ -202,7 +204,7 @@ struct EInkDisplay *eink_init(struct EInkConfig* cfg) {
   }
 
   display->cfg.mock_display = cfg->mock_display;
-  display->cfg.save_render_to_png_file = strdup(cfg->save_render_to_png_file);
+  display->cfg.save_render_to_png_file = cfg->save_render_to_png_file? strdup(cfg->save_render_to_png_file) : NULL;
   if (cfg->save_render_to_png_file && !display->cfg.save_render_to_png_file) {
     fprintf(stderr, "bad_alloc: save_render_to_png_file\n");
     goto err;
@@ -240,7 +242,13 @@ struct EInkDisplay *eink_init(struct EInkConfig* cfg) {
   cairo_set_source_rgba(display->cr, 1, 1, 1, display->cairo_bg_color);
   cairo_paint(display->cr);
 
-  if (!display->cfg.mock_display) {
+  if (display->cfg.mock_display) {
+    if (display->cfg.save_render_to_png_file) {
+      printf("Skip eInk display render, saving to %s instead\n", display->cfg.save_render_to_png_file);
+    } else {
+      printf("Skip eInk display render\n");
+    }
+  } else {
     display->gpio_handle = lgGpiochipOpen(0);
     if (display->gpio_handle < 0) {
       display->gpio_handle = lgGpiochipOpen(4);
@@ -346,7 +354,7 @@ static void eink_render_impl(struct EInkDisplay *display, bool is_partial) {
     }
   }
 
-  if (!display->cfg.mock_display) {
+  if (display->cfg.mock_display) {
     printf("EInk: skip render, mocking display\n");
   } else {
     dev_render(display, display->render_buff, is_partial);
@@ -428,3 +436,22 @@ void eink_clear(struct EInkDisplay *display) {
 
   dev_wakeup(display, false);
 }
+
+void eink_quick_announce(struct EInkDisplay *display, const char* msg, size_t font_sz) {
+  cairo_t *cr = eink_get_cairo(display);
+
+  // Reset canvas
+  cairo_set_source_rgba(cr, 0, 0, 0, 0);
+  cairo_paint(cr);
+
+  cairo_set_source_rgba(cr, 0, 0, 0, 1);
+  cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL,
+                         CAIRO_FONT_WEIGHT_BOLD);
+  cairo_set_font_size(cr, 24);
+
+  cairo_render_text(cr, msg, 1);
+  cairo_stroke(cr);
+
+  eink_render(display);
+}
+
