@@ -22,6 +22,10 @@ struct EInkDisplay {
   cairo_t *cr;
   int cairo_fg_color;
   int cairo_bg_color;
+
+  // Used as a temporary buffer when rendering
+  size_t render_buff_sz;
+  uint8_t *render_buff;
 };
 
 #define EPD_2in13_V4_WIDTH 122
@@ -220,14 +224,13 @@ struct EInkDisplay *eink_init(struct EInkConfig* cfg) {
   display->surface = cairo_image_surface_create(CAIRO_FORMAT_A1, display->width,
                                                 display->height);
 
-  if (!display->surface) {
-    fprintf(stderr, "bad_alloc: display->surface\n");
-    goto err;
-  }
-
+  const size_t height_bytes = (display->height + 7) / 8; // Same as ceil(height / 8)
+  display->render_buff_sz = height_bytes * display->width;
+  display->render_buff = malloc(display->render_buff_sz);
   display->cr = cairo_create(display->surface);
-  if (!display->cr) {
-    fprintf(stderr, "bad_alloc: display->cr\n");
+
+  if (!display->surface || !display->render_buff || !display->cr) {
+    fprintf(stderr, "bad_alloc\n");
     goto err;
   }
 
@@ -285,6 +288,10 @@ void eink_delete(struct EInkDisplay *display) {
     cairo_destroy(display->cr);
   }
 
+  if (display->render_buff) {
+    free(display->render_buff);
+  }
+
   if (display->cr) {
     cairo_surface_destroy(display->surface);
   }
@@ -313,33 +320,28 @@ void eink_delete(struct EInkDisplay *display) {
 cairo_t *eink_get_cairo(struct EInkDisplay *display) { return display->cr; }
 
 static void eink_render_impl(struct EInkDisplay *display, bool is_partial) {
-  cairo_surface_t *surface = display->surface;
-  const size_t width = cairo_image_surface_get_width(surface);
-  const size_t height = cairo_image_surface_get_height(surface);
-  const size_t stride = cairo_image_surface_get_stride(surface);
-  uint8_t *img_data = cairo_image_surface_get_data(surface);
-  const size_t height_bytes = (height + 7) / 8; // Same as ceil(height / 8)
+  const size_t stride = cairo_image_surface_get_stride(display->surface);
+  uint8_t *img_data = cairo_image_surface_get_data(display->surface);
+  const size_t height_bytes = (display->height + 7) / 8; // Same as ceil(height / 8)
 
-  const size_t display_canvas_sz = height_bytes * width;
-  uint8_t *display_canvas = malloc(display_canvas_sz);
-  memset(display_canvas, 0, display_canvas_sz);
+  memset(display->render_buff, 0, display->render_buff_sz);
 
-  for (size_t y = 0; y < height; y++) {
-    for (size_t x = 0; x < width; x++) {
+  for (size_t y = 0; y < display->height; y++) {
+    for (size_t x = 0; x < display->width; x++) {
       const size_t src_byte_index = x / 8 + y * stride;
       const size_t src_bit_index = x % 8;
 
       // Display memory is rotated; rotate coordinates
-      const size_t dest_x = height - 1 - y;
+      const size_t dest_x = display->height - 1 - y;
       const size_t dest_y = x;
       const size_t dest_byte_index = dest_x / 8 + dest_y * height_bytes;
       const size_t dest_bit_index = dest_x % 8;
 
       bool pixel_set = img_data[src_byte_index] & (1 << src_bit_index);
       if (pixel_set == display->invert_color) {
-        display_canvas[dest_byte_index] |= (1 << (7 - dest_bit_index));
+        display->render_buff[dest_byte_index] |= (1 << (7 - dest_bit_index));
       } else {
-        display_canvas[dest_byte_index] &= ~(1 << (7 - dest_bit_index));
+        display->render_buff[dest_byte_index] &= ~(1 << (7 - dest_bit_index));
       }
     }
   }
@@ -347,11 +349,11 @@ static void eink_render_impl(struct EInkDisplay *display, bool is_partial) {
   if (!display->cfg.mock_display) {
     printf("EInk: skip render, mocking display\n");
   } else {
-    dev_render(display, display_canvas, is_partial);
+    dev_render(display, display->render_buff, is_partial);
   }
 
   if (display->cfg.save_render_to_png_file) {
-    cairo_surface_write_to_png(surface, display->cfg.save_render_to_png_file);
+    cairo_surface_write_to_png(display->surface, display->cfg.save_render_to_png_file);
   }
 }
 
